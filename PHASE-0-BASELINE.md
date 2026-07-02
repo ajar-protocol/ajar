@@ -19,7 +19,7 @@ This file records the local evidence for the v0.1 draft specification baseline.
 `make validate` must report:
 
 ```text
-Validated 10 valid examples, 5 invalid examples, 4 signing vectors, 2 HTTP signature vectors, 5 extension vectors, 10 core vectors, 8 runtime vectors, and 10 scope vectors.
+Validated 10 valid examples, 5 invalid examples, 4 signing vectors, 2 HTTP signature vectors, 5 extension vectors, 4 manifest check vectors, 10 core vectors, 8 runtime vectors, and 10 scope vectors.
 Markdown links OK.
 Markdown hygiene OK.
 ```

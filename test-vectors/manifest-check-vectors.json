@@ -1,0 +1,39 @@
+{
+  "ajar_version": "0.1",
+  "vectors": [
+    {
+      "id": "manifest-check-blog-valid",
+      "manifest": "examples/manifests/blog-core.json",
+      "served_path": "/.well-known/ajar.json",
+      "expected": {
+        "valid": true
+      }
+    },
+    {
+      "id": "manifest-check-commerce-valid",
+      "manifest": "examples/manifests/commerce-core-act-pay.json",
+      "served_path": "/.well-known/ajar.json",
+      "expected": {
+        "valid": true
+      }
+    },
+    {
+      "id": "manifest-check-wrong-served-path",
+      "manifest": "examples/manifests/blog-core.json",
+      "served_path": "/ajar.json",
+      "expected": {
+        "valid": false,
+        "contains": "AJAR-POLICY-DENIED"
+      }
+    },
+    {
+      "id": "manifest-check-risk-floor-invalid",
+      "manifest": "examples/invalid/risk-floor/manifest.json",
+      "served_path": "/.well-known/ajar.json",
+      "expected": {
+        "valid": false,
+        "contains": "two_phase"
+      }
+    }
+  ]
+}

@@ -96,6 +96,7 @@ def check_examples_and_vectors(failures: list[str]) -> None:
         "crypto-signing.json",
         "extension-vectors.json",
         "http-signature-vectors.json",
+        "manifest-check-vectors.json",
         "runtime-vectors.json",
         "scope-vectors.json",
     ]
@@ -119,7 +120,7 @@ def check_local_validation(failures: list[str]) -> None:
     except subprocess.CalledProcessError as exc:
         failures.append(f"make validate failed:\n{exc.stdout}\n{exc.stderr}")
         return
-    expected = "Validated 10 valid examples, 5 invalid examples, 4 signing vectors, 2 HTTP signature vectors, 5 extension vectors, 10 core vectors, 8 runtime vectors, and 10 scope vectors."
+    expected = "Validated 10 valid examples, 5 invalid examples, 4 signing vectors, 2 HTTP signature vectors, 5 extension vectors, 4 manifest check vectors, 10 core vectors, 8 runtime vectors, and 10 scope vectors."
     if expected not in output:
         failures.append("make validate output did not include expected vector summary")
 

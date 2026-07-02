@@ -14,6 +14,7 @@ Files:
 - `extension-vectors.json` — version/extension policy schema vectors
 - `http-signature-vectors.json` — agent HTTP request signature vectors
 - `http-request.json` — canonical request fixture used by HTTP signature vectors
+- `manifest-check-vectors.json` — implementer-facing manifest checklist vectors
 - `runtime-vectors.json` — executable decision vectors for HTTP surface, client sequencing, and fallback rules
 - `scope-vectors.json` — executable mandate-scope matching and deny-override vectors
 - `must-coverage.md` — initial mapping from normative MUSTs to vectors

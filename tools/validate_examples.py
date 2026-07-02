@@ -32,6 +32,7 @@ TEST_VECTORS = ROOT / "test-vectors"
 from signing_profile import b64url, canonical_json_bytes, ed25519_verify, public_key, signing_payload, unb64url
 from scope_match import scope_allowed
 from http_signature import sign_request, verify_request
+from manifest_check import check_manifest
 
 
 VALID_EXAMPLES = {
@@ -269,6 +270,31 @@ def validate_extension_vectors() -> list[str]:
     return failures
 
 
+def validate_manifest_check_vectors() -> list[str]:
+    failures: list[str] = []
+    vectors = load_json(TEST_VECTORS / "manifest-check-vectors.json")["vectors"]
+    seen_ids: set[str] = set()
+
+    for vector in vectors:
+        vector_id = vector["id"]
+        if vector_id in seen_ids:
+            failures.append(f"duplicate manifest check vector id: {vector_id}")
+        seen_ids.add(vector_id)
+
+        result = check_manifest(ROOT / vector["manifest"], vector.get("served_path"))
+        expected = vector["expected"]
+        if result["valid"] != expected["valid"]:
+            failures.append(f"{vector_id} expected valid={expected['valid']} but got valid={result['valid']}")
+            continue
+        contains = expected.get("contains")
+        if contains:
+            haystack = "\n".join(result["schema_errors"] + result["semantic_errors"])
+            if contains not in haystack:
+                failures.append(f"{vector_id} expected error containing {contains!r}")
+
+    return failures
+
+
 def validate_core_vectors() -> list[str]:
     failures: list[str] = []
     vectors = load_json(TEST_VECTORS / "core-vectors.json")["vectors"]
@@ -344,7 +370,8 @@ def validate_must_coverage() -> list[str]:
     scope_ids = {vector["id"] for vector in load_json(TEST_VECTORS / "scope-vectors.json")["vectors"]}
     http_ids = {vector["id"] for vector in load_json(TEST_VECTORS / "http-signature-vectors.json")["vectors"]}
     extension_ids = {vector["id"] for vector in load_json(TEST_VECTORS / "extension-vectors.json")["vectors"]}
-    vector_ids = core_ids | runtime_ids | scope_ids | http_ids | extension_ids
+    manifest_check_ids = {vector["id"] for vector in load_json(TEST_VECTORS / "manifest-check-vectors.json")["vectors"]}
+    vector_ids = core_ids | runtime_ids | scope_ids | http_ids | extension_ids | manifest_check_ids
     text = (TEST_VECTORS / "must-coverage.md").read_text(encoding="utf-8")
     for token in re.findall(r"`([^`]+)`", text):
         if token.startswith("/") or token.endswith(".json"):
@@ -458,6 +485,7 @@ def main() -> int:
         + validate_crypto_vectors()
         + validate_http_signature_vectors()
         + validate_extension_vectors()
+        + validate_manifest_check_vectors()
         + validate_core_vectors()
         + validate_runtime_vectors()
         + validate_scope_vectors()
@@ -473,13 +501,14 @@ def main() -> int:
     crypto_count = len(load_json(TEST_VECTORS / "crypto-signing.json")["vectors"])
     http_count = len(load_json(TEST_VECTORS / "http-signature-vectors.json")["vectors"])
     extension_count = len(load_json(TEST_VECTORS / "extension-vectors.json")["vectors"])
+    manifest_check_count = len(load_json(TEST_VECTORS / "manifest-check-vectors.json")["vectors"])
     core_count = len(load_json(TEST_VECTORS / "core-vectors.json")["vectors"])
     runtime_count = len(load_json(TEST_VECTORS / "runtime-vectors.json")["vectors"])
     scope_count = len(load_json(TEST_VECTORS / "scope-vectors.json")["vectors"])
     print(
         f"Validated {valid_count} valid examples, {invalid_count} invalid examples, "
         f"{crypto_count} signing vectors, {http_count} HTTP signature vectors, "
-        f"{extension_count} extension vectors, {core_count} core vectors, "
+        f"{extension_count} extension vectors, {manifest_check_count} manifest check vectors, {core_count} core vectors, "
         f"{runtime_count} runtime vectors, and {scope_count} scope vectors."
     )
     return 0
