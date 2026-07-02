@@ -13,8 +13,14 @@ templates, licenses, security policy, conduct policy, and contribution rules.
 Formal Phase 0 exit still requires two non-local proofs:
 
 - hosted validation must run on GitHub main
+  ([issue #1](https://github.com/ajar-protocol/ajar/issues/1))
 - two independent readers must hand-write valid manifests from the spec alone,
   and those manifests must validate
+  ([issue #2](https://github.com/ajar-protocol/ajar/issues/2))
+
+The final ambiguity pass is tracked separately because it can produce either
+blocking fixes or documented deferrals
+([issue #3](https://github.com/ajar-protocol/ajar/issues/3)).
 
 ## Task Evidence
 
