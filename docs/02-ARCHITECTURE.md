@@ -46,6 +46,52 @@ discover → verify → bind → (simulate → act → receipt) → disconnect
 
 Trust triangle: **Principal → (mandate) → Agent → (signed requests) → Site**, with the Site's manifest signed by the **Owner key** and logged in transparency logs. Every consequential exchange produces dual-signed **receipts**.
 
+### 2.1 Public reads, private reads, and authenticated actions
+
+Ajar treats authentication as two linked questions: who is calling, and whose
+authority are they using? A signed agent request answers the first question. A
+principal-signed mandate answers the second.
+
+This is different from handing the model a website cookie. A cookie usually
+opens the whole logged-in session. A mandate is narrower: it names the agent key,
+the allowed scopes, the domains, the caps, the expiry, and the revocation
+endpoint. The model can ask to do something, but the Kernel and Gateway decide
+whether the signed authority actually covers it.
+
+Public reads are the easiest case. A product page, public price, docs page, or
+blog post can be exposed to anonymous, signed, or verified agents by owner
+policy. No user account is involved.
+
+Private reads are different even when they are "read only." Order history,
+invoices, profile fields, support tickets, carts, and saved addresses belong to
+a particular account. An agent should only get them after the account is linked
+to a principal key and the principal has delegated that access.
+
+Writes and purchases need stronger handling again. A reversible write such as a
+cart update or inventory hold is at least R1: it needs idempotency and SIMULATE.
+An irreversible, legal, financial, or personal-data action is R2/R3: it needs a
+mandate, SIMULATE, a site-signed Offer, a signed Commit, and a Receipt.
+
+For an authenticated action, the flow is:
+
+1. The principal logs in normally on the site and links the account to their
+   principal key.
+2. The principal signs a mandate: agent key, allowed scopes, domain constraints,
+   caps, validity window, and revocation endpoint.
+3. The agent sends signed Ajar requests. The model never sees key material or
+   website session secrets.
+4. The Gateway verifies the agent signature, resolves the audience tier, checks
+   the account binding, and validates the mandate.
+5. For R2/R3 actions, the Kernel simulates first, checks the result against the
+   mandate, asks the site for a signed Offer, then commits only if policy still
+   allows it.
+6. The site executes against the real backend account and returns a signed
+   Receipt that both sides retain.
+
+In the v0.1 draft, mandates, scopes, risk classes, signed requests, and receipts
+are protocol objects. The exact account-linking ceremony is integration-specific
+today and is a likely AEP candidate once multiple site implementations converge.
+
 ## 3. Component architecture
 
 ### 3.1 The Gateway (site-side; the flagship)

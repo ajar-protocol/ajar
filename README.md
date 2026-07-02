@@ -4,6 +4,24 @@ This repo contains the vendor-neutral Ajar Protocol specification. If a rule is 
 
 Ajar is an owner-controlled semantic layer over HTTPS. It defines a signed Capability Manifest at `/.well-known/ajar.json`, semantic Views via content negotiation, typed Actions with risk classes R0-R3, SIMULATE dry runs, two-phase Offer/Commit with dual-signed Receipts, principal-signed Mandates, and 402-native metering with pluggable settlement.
 
+## Why this matters
+
+A normal website has pages for people and private routes for its own app. An
+agent can try to use that surface like a person, but it breaks down quickly. It
+may scrape stale HTML, hit a form that changes state, reuse a user's browser
+session, or buy something without a clean record of who approved it.
+
+Ajar gives the site an agent-facing contract. The owner publishes what agents
+may read and which actions exist. Agents sign their requests. Users and
+organizations sign mandates that say exactly what an agent may do. For risky
+work, the site must first simulate the result, then issue a signed offer, then
+accept a signed commit. Both sides keep the receipt.
+
+The auth rule is intentionally strict: public data can be exposed without a user
+session; account data needs a linked account and user authority; writes,
+purchases, legal changes, and personal-data actions need the full mandate and
+receipt flow.
+
 ## Contents
 
 | Path | What |
