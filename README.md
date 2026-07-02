@@ -34,7 +34,7 @@ python tools/validate_examples.py
 Expected result:
 
 ```text
-Validated 10 valid examples, 5 invalid examples, 4 signing vectors, and 10 core vectors.
+Validated 10 valid examples, 5 invalid examples, 4 signing vectors, 10 core vectors, and 6 runtime vectors.
 ```
 
 CI runs the same validation for every push and pull request.

@@ -1,13 +1,15 @@
 # /test-vectors
 
-Seed conformance-vector data for the v0.1 draft.
+Executable seed conformance-vector data for the v0.1 draft.
 
-These files are data, not an executable harness. They document expected
-verdicts and spec clauses so the future `conformance` repo can turn them into
-tests without rediscovering coverage.
+These files document expected verdicts and spec clauses. `tools/validate_examples.py`
+executes the static and runtime vectors that can be checked inside this repo.
+The future `conformance` repo can reuse the same vector ids and expected
+verdicts when it adds implementation-facing network tests.
 
 Files:
 
 - `core-vectors.json` — manifest, offer, mandate, and receipt verdict examples
 - `crypto-signing.json` — worked canonicalization and Ed25519 signing vectors
+- `runtime-vectors.json` — executable decision vectors for HTTP surface, client sequencing, and fallback rules
 - `must-coverage.md` — initial mapping from normative MUSTs to vectors

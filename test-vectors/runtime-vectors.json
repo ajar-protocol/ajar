@@ -1,0 +1,86 @@
+{
+  "ajar_version": "0.1",
+  "vectors": [
+    {
+      "id": "http-manifest-well-known-location",
+      "spec_section": "2.1",
+      "kind": "http_surface",
+      "input": {
+        "method": "GET",
+        "path": "/.well-known/ajar.json",
+        "serves_manifest": true
+      },
+      "expected": {
+        "verdict": "accept"
+      }
+    },
+    {
+      "id": "http-manifest-wrong-location",
+      "spec_section": "2.1",
+      "kind": "http_surface",
+      "input": {
+        "method": "GET",
+        "path": "/ajar.json",
+        "serves_manifest": true
+      },
+      "expected": {
+        "verdict": "reject",
+        "error_code": "AJAR-POLICY-DENIED"
+      }
+    },
+    {
+      "id": "client-r3-propose-without-simulate",
+      "spec_section": "6",
+      "kind": "client_action_sequence",
+      "input": {
+        "action_risk": "R3",
+        "attempted_mode": "propose",
+        "prior_simulation": false
+      },
+      "expected": {
+        "verdict": "reject",
+        "error_code": "AJAR-SIMULATE-REQUIRED"
+      }
+    },
+    {
+      "id": "client-r3-propose-after-simulate",
+      "spec_section": "6",
+      "kind": "client_action_sequence",
+      "input": {
+        "action_risk": "R3",
+        "attempted_mode": "propose",
+        "prior_simulation": true
+      },
+      "expected": {
+        "verdict": "accept"
+      }
+    },
+    {
+      "id": "fallback-r3-without-human",
+      "spec_section": "9",
+      "kind": "fallback_operation",
+      "input": {
+        "manifest_present": false,
+        "derived_operation_risk": "R3",
+        "human_confirmation": false
+      },
+      "expected": {
+        "verdict": "reject",
+        "error_code": "AJAR-FALLBACK-HUMAN-REQUIRED"
+      }
+    },
+    {
+      "id": "fallback-r3-with-human",
+      "spec_section": "9",
+      "kind": "fallback_operation",
+      "input": {
+        "manifest_present": false,
+        "derived_operation_risk": "R3",
+        "human_confirmation": true
+      },
+      "expected": {
+        "verdict": "accept"
+      }
+    }
+  ]
+}

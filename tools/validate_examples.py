@@ -80,20 +80,22 @@ def parse_dt(value: str) -> datetime:
     return datetime.fromisoformat(value.replace("Z", "+00:00"))
 
 
-def semantic_failure(case: dict, instance: dict) -> bool:
+def semantic_failure(case: dict, instance: dict, base_dir: Path) -> bool:
     rule = case.get("rule")
     if rule == "offer-expired-at-issue":
         return parse_dt(instance["expires_at"]) <= parse_dt(instance["issued_at"])
 
     if rule == "offer-exceeds-mandate-cap":
-        mandate = load_json(EXAMPLES / "invalid" / case["mandate"])
+        mandate_path = case.get("mandate", case.get("context", {}).get("mandate"))
+        mandate = load_json(base_dir / mandate_path)
         currency = instance["total_cost"]["currency"]
         amount = Decimal(instance["total_cost"]["amount"])
         cap = Decimal(str(mandate["caps"]["per_tx"][currency]))
         return amount > cap
 
     if rule == "manifest-sequence-rollback":
-        return int(instance["sequence"]) < int(case["last_seen_sequence"])
+        last_seen = case.get("last_seen_sequence", case.get("state", {}).get("last_seen_sequence"))
+        return int(instance["sequence"]) < int(last_seen)
 
     raise ValueError(f"Unknown invalid semantic rule: {rule}")
 
@@ -129,7 +131,7 @@ def validate_invalid_examples(store: dict[str, dict]) -> list[str]:
             continue
 
         if case["expected"] == "semantic-fail":
-            if not semantic_failure(case, instance):
+            if not semantic_failure(case, instance, EXAMPLES / "invalid"):
                 failures.append(f"{case['id']} did not trigger semantic rule {case['rule']}")
             continue
 
@@ -168,6 +170,7 @@ def validate_core_vectors() -> list[str]:
     vectors = load_json(TEST_VECTORS / "core-vectors.json")["vectors"]
     invalid_cases = {case["error_code"] for case in load_json(EXAMPLES / "invalid" / "index.json")["cases"]}
     error_registry = (ROOT / "registries" / "error-codes.md").read_text(encoding="utf-8")
+    store = load_schemas()
     seen_ids: set[str] = set()
 
     for vector in vectors:
@@ -179,6 +182,7 @@ def validate_core_vectors() -> list[str]:
         input_path = (TEST_VECTORS / vector["input"]).resolve()
         if not input_path.exists():
             failures.append(f"{vector_id} input does not exist: {vector['input']}")
+            continue
 
         for context_path in vector.get("context", {}).values():
             resolved = (TEST_VECTORS / context_path).resolve()
@@ -196,22 +200,112 @@ def validate_core_vectors() -> list[str]:
             elif error_code not in invalid_cases and error_code not in error_registry:
                 failures.append(f"{vector_id} references unknown error code: {error_code}")
 
+        if "schema" not in vector:
+            failures.append(f"{vector_id} is missing schema")
+            continue
+
+        instance = load_json(input_path)
+        schema_errors = collect_errors(validator_for(vector["schema"], store), instance)
+        rule = vector.get("rule")
+
+        if verdict == "accept":
+            if schema_errors:
+                failures.append(f"{vector_id} expected accept but schema failed:\n  " + "\n  ".join(schema_errors))
+            elif rule and semantic_failure(vector, instance, TEST_VECTORS):
+                failures.append(f"{vector_id} expected accept but semantic rule failed: {rule}")
+            continue
+
+        if rule == "schema-fail":
+            if not schema_errors:
+                failures.append(f"{vector_id} expected schema failure but schema passed")
+            continue
+
+        if schema_errors:
+            failures.append(f"{vector_id} expected semantic rejection but schema failed first:\n  " + "\n  ".join(schema_errors))
+            continue
+
+        if rule:
+            if not semantic_failure(vector, instance, TEST_VECTORS):
+                failures.append(f"{vector_id} did not trigger semantic rule: {rule}")
+        else:
+            failures.append(f"{vector_id} reject vector is missing rule")
+
     return failures
 
 
 def validate_must_coverage() -> list[str]:
     failures: list[str] = []
     core_ids = {vector["id"] for vector in load_json(TEST_VECTORS / "core-vectors.json")["vectors"]}
+    runtime_ids = {vector["id"] for vector in load_json(TEST_VECTORS / "runtime-vectors.json")["vectors"]}
+    vector_ids = core_ids | runtime_ids
     text = (TEST_VECTORS / "must-coverage.md").read_text(encoding="utf-8")
     for token in re.findall(r"`([^`]+)`", text):
         if token.startswith("/") or token.endswith(".json"):
+            continue
+        if "/" in token:
             continue
         if ":" in token or " " in token:
             continue
         if token.startswith("http") or token.startswith("Idempotency-Key"):
             continue
-        if token not in core_ids:
+        if token not in vector_ids:
             failures.append(f"must-coverage.md references unknown vector id: {token}")
+    return failures
+
+
+def runtime_verdict(vector: dict) -> tuple[str, str | None]:
+    kind = vector["kind"]
+    data = vector["input"]
+
+    if kind == "http_surface":
+        if data["method"] == "GET" and data["path"] == "/.well-known/ajar.json" and data["serves_manifest"]:
+            return "accept", None
+        return "reject", "AJAR-POLICY-DENIED"
+
+    if kind == "client_action_sequence":
+        if data["attempted_mode"] == "propose" and data["action_risk"] in {"R2", "R3"} and not data["prior_simulation"]:
+            return "reject", "AJAR-SIMULATE-REQUIRED"
+        return "accept", None
+
+    if kind == "fallback_operation":
+        if (
+            not data["manifest_present"]
+            and data["derived_operation_risk"] in {"R2", "R3"}
+            and not data["human_confirmation"]
+        ):
+            return "reject", "AJAR-FALLBACK-HUMAN-REQUIRED"
+        return "accept", None
+
+    raise ValueError(f"Unknown runtime vector kind: {kind}")
+
+
+def validate_runtime_vectors() -> list[str]:
+    failures: list[str] = []
+    vectors = load_json(TEST_VECTORS / "runtime-vectors.json")["vectors"]
+    error_registry = (ROOT / "registries" / "error-codes.md").read_text(encoding="utf-8")
+    seen_ids: set[str] = set()
+
+    for vector in vectors:
+        vector_id = vector["id"]
+        if vector_id in seen_ids:
+            failures.append(f"duplicate runtime vector id: {vector_id}")
+        seen_ids.add(vector_id)
+
+        actual_verdict, actual_error = runtime_verdict(vector)
+        expected = vector["expected"]
+        if actual_verdict != expected["verdict"]:
+            failures.append(f"{vector_id} expected {expected['verdict']} but got {actual_verdict}")
+            continue
+
+        expected_error = expected.get("error_code")
+        if actual_verdict == "reject":
+            if not expected_error:
+                failures.append(f"{vector_id} reject vector is missing error_code")
+            elif expected_error != actual_error:
+                failures.append(f"{vector_id} expected {expected_error} but got {actual_error}")
+            elif expected_error not in error_registry:
+                failures.append(f"{vector_id} references unknown error code: {expected_error}")
+
     return failures
 
 
@@ -222,6 +316,7 @@ def main() -> int:
         + validate_invalid_examples(store)
         + validate_crypto_vectors()
         + validate_core_vectors()
+        + validate_runtime_vectors()
         + validate_must_coverage()
     )
     if failures:
@@ -233,9 +328,11 @@ def main() -> int:
     invalid_count = len(load_json(EXAMPLES / "invalid" / "index.json")["cases"])
     crypto_count = len(load_json(TEST_VECTORS / "crypto-signing.json")["vectors"])
     core_count = len(load_json(TEST_VECTORS / "core-vectors.json")["vectors"])
+    runtime_count = len(load_json(TEST_VECTORS / "runtime-vectors.json")["vectors"])
     print(
         f"Validated {valid_count} valid examples, {invalid_count} invalid examples, "
-        f"{crypto_count} signing vectors, and {core_count} core vectors."
+        f"{crypto_count} signing vectors, {core_count} core vectors, and "
+        f"{runtime_count} runtime vectors."
     )
     return 0
 

@@ -5,6 +5,7 @@
       "id": "manifest-core-valid",
       "profile": "CORE",
       "spec_section": "3",
+      "schema": "manifest.schema.json",
       "input": "../examples/manifests/blog-core.json",
       "expected": {
         "verdict": "accept"
@@ -14,6 +15,7 @@
       "id": "manifest-act-pay-valid",
       "profile": "ACT",
       "spec_section": "3",
+      "schema": "manifest.schema.json",
       "input": "../examples/manifests/commerce-core-act-pay.json",
       "expected": {
         "verdict": "accept"
@@ -23,7 +25,9 @@
       "id": "manifest-bad-signature-shape",
       "profile": "CORE",
       "spec_section": "2.4",
+      "schema": "manifest.schema.json",
       "input": "../examples/invalid/bad-signature/manifest.json",
+      "rule": "schema-fail",
       "expected": {
         "verdict": "reject",
         "error_code": "AJAR-VERIFY-BAD-SIGNATURE"
@@ -33,7 +37,9 @@
       "id": "manifest-sequence-rollback",
       "profile": "CORE",
       "spec_section": "3",
+      "schema": "manifest.schema.json",
       "input": "../examples/invalid/sequence-rollback/current-manifest.json",
+      "rule": "manifest-sequence-rollback",
       "state": {
         "last_seen_sequence": 42
       },
@@ -46,7 +52,9 @@
       "id": "action-risk-floor-lowered",
       "profile": "ACT",
       "spec_section": "5.1",
+      "schema": "manifest.schema.json",
       "input": "../examples/invalid/risk-floor/manifest.json",
+      "rule": "schema-fail",
       "expected": {
         "verdict": "reject",
         "error_code": "AJAR-ACTION-RISK-FLOOR"
@@ -56,6 +64,7 @@
       "id": "offer-valid",
       "profile": "ACT",
       "spec_section": "7",
+      "schema": "offer.schema.json",
       "input": "../examples/scenario-tickets/offer.json",
       "expected": {
         "verdict": "accept"
@@ -65,7 +74,9 @@
       "id": "offer-expired-at-issue",
       "profile": "ACT",
       "spec_section": "7",
+      "schema": "offer.schema.json",
       "input": "../examples/invalid/expired-offer/offer.json",
+      "rule": "offer-expired-at-issue",
       "expected": {
         "verdict": "reject",
         "error_code": "AJAR-OFFER-EXPIRED"
@@ -75,6 +86,7 @@
       "id": "mandate-valid-ticket-purchase",
       "profile": "ACT",
       "spec_section": "8.1",
+      "schema": "mandate.schema.json",
       "input": "../examples/scenario-tickets/mandate.json",
       "expected": {
         "verdict": "accept"
@@ -84,7 +96,9 @@
       "id": "mandate-cap-exceeded",
       "profile": "ACT",
       "spec_section": "8.1",
+      "schema": "offer.schema.json",
       "input": "../examples/invalid/over-cap-commit/offer.json",
+      "rule": "offer-exceeds-mandate-cap",
       "context": {
         "mandate": "../examples/invalid/over-cap-commit/mandate.json"
       },
@@ -97,6 +111,7 @@
       "id": "receipt-valid-ticket-purchase",
       "profile": "ACT",
       "spec_section": "8.2",
+      "schema": "receipt.schema.json",
       "input": "../examples/scenario-tickets/receipt.json",
       "expected": {
         "verdict": "accept"

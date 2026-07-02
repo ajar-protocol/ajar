@@ -218,7 +218,7 @@ Clients MAY interact with non-Ajar sites via rendering/extraction, but MUST: hon
 - **Gateway/CORE:** valid signed manifest; negotiated signed views; chunk diff.
 - **Gateway/ACT:** risk classes enforced per §5.1 table; SIMULATE fidelity; two-phase integrity; mandate verification; receipts.
 - **Client:** verification pipeline (§3); simulate-before-commit; deterministic mandate enforcement; receipt retention; fallback rules (§9).
-- Seed data vectors live in `/test-vectors`; the executable harness belongs in the future `conformance` repo. Implementations claim compatibility only against the public conformance suite once that harness exists.
+- Executable seed vectors live in `/test-vectors` and are checked by `tools/validate_examples.py`. A future standalone conformance repo will turn these data vectors into a public implementation harness.
 
 ## 12. Open questions (tracked in DECISIONS.md)
 
