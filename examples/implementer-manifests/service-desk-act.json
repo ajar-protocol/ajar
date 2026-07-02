@@ -1,0 +1,129 @@
+{
+  "ajar_version": "0.1",
+  "supported_versions": ["0.1"],
+  "profiles": ["CORE", "ACT"],
+  "site": {
+    "name": "Example Service Desk",
+    "domain": "support.example",
+    "description": "Support portal exposing read views and mandate-gated ticket actions.",
+    "languages": ["en"],
+    "legal_entity": "Example Support Services LLC",
+    "contact": "agents@support.example"
+  },
+  "keys": {
+    "owner": {
+      "kty": "OKP",
+      "crv": "Ed25519",
+      "x": "ownerServiceDeskKey001",
+      "kid": "owner-2026"
+    },
+    "operational": [
+      {
+        "key": {
+          "kty": "OKP",
+          "crv": "Ed25519",
+          "x": "opsServiceDeskContentKey001",
+          "kid": "content-2026-07"
+        },
+        "scope": ["content-signing"],
+        "valid_until": "2026-10-01T00:00:00Z",
+        "certification": {
+          "alg": "Ed25519",
+          "kid": "owner-2026",
+          "sig": "certServiceDeskContent001"
+        }
+      },
+      {
+        "key": {
+          "kty": "OKP",
+          "crv": "Ed25519",
+          "x": "opsServiceDeskReceiptKey001",
+          "kid": "receipt-2026-07"
+        },
+        "scope": ["offer-signing", "receipt-signing"],
+        "valid_until": "2026-10-01T00:00:00Z",
+        "certification": {
+          "alg": "Ed25519",
+          "kid": "owner-2026",
+          "sig": "certServiceDeskReceipt001"
+        }
+      }
+    ]
+  },
+  "views": {
+    "negotiation": ["application/ajar+json", "text/markdown"],
+    "index": "/ajar/views/index",
+    "chunking": {
+      "stable_ids": true,
+      "diff": "etag-per-chunk"
+    },
+    "license": {
+      "read": "allowed",
+      "train": "denied",
+      "terms": "/terms/agent-support"
+    }
+  },
+  "actions": [
+    {
+      "id": "create_support_ticket",
+      "title": "Create support ticket",
+      "risk": "R2",
+      "input_schema": {
+        "type": "object",
+        "required": ["account_id", "subject", "description"],
+        "properties": {
+          "account_id": { "type": "string" },
+          "subject": { "type": "string" },
+          "description": { "type": "string" },
+          "priority": { "type": "string", "enum": ["normal", "urgent"] }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": ["ticket_id", "status"],
+        "properties": {
+          "ticket_id": { "type": "string" },
+          "status": { "type": "string" }
+        }
+      },
+      "effects": [
+        {
+          "type": "resource.create",
+          "resource": "support_ticket",
+          "description": "Creates a support ticket visible to the service desk."
+        }
+      ],
+      "simulate": true,
+      "execution": "two_phase",
+      "idempotency": "required",
+      "requires": {
+        "tier": "verified",
+        "mandate_scopes": ["communication.message.send"]
+      },
+      "pricing": {
+        "per_call": "0",
+        "settlement_on_commit": false
+      },
+      "endpoint": "/ajar/actions/create_support_ticket",
+      "transport": "ajar-http"
+    }
+  ],
+  "policy_summary": {
+    "audience_tiers": ["signed", "verified", "allowlist"],
+    "rate_limits": {
+      "signed": "120/h",
+      "verified": "1200/h",
+      "allowlist": "10000/h"
+    },
+    "requires_mandate_from_risk": "R2"
+  },
+  "issued_at": "2026-07-02T00:00:00Z",
+  "expires_at": "2026-10-01T00:00:00Z",
+  "sequence": 5,
+  "signature": {
+    "alg": "Ed25519",
+    "kid": "owner-2026",
+    "sig": "manifestServiceDeskSignature001"
+  }
+}

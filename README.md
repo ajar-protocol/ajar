@@ -36,7 +36,7 @@ python3 tools/check_phase0.py
 Expected result:
 
 ```text
-Validated 10 valid examples, 6 invalid examples, 4 signing vectors, 2 HTTP signature vectors, 5 extension vectors, 5 manifest check vectors, 10 core vectors, 18 runtime vectors, and 10 scope vectors.
+Validated 12 valid examples, 6 invalid examples, 4 signing vectors, 2 HTTP signature vectors, 5 extension vectors, 5 manifest check vectors, 10 core vectors, 18 runtime vectors, and 10 scope vectors.
 MUST coverage OK: 21 requirements mapped.
 ```
 

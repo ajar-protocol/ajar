@@ -40,6 +40,8 @@ VALID_EXAMPLES = {
         "manifests/blog-core.json",
         "manifests/docs-core-pay.json",
         "manifests/commerce-core-act-pay.json",
+        "implementer-manifests/static-knowledge-base.json",
+        "implementer-manifests/service-desk-act.json",
     ],
     "view.schema.json": ["views/blog-home.view.json"],
     "policy.schema.json": ["policies/default-owner-policy.json"],
