@@ -12,4 +12,5 @@ Files:
 - `core-vectors.json` — manifest, offer, mandate, and receipt verdict examples
 - `crypto-signing.json` — worked canonicalization and Ed25519 signing vectors
 - `runtime-vectors.json` — executable decision vectors for HTTP surface, client sequencing, and fallback rules
+- `scope-vectors.json` — executable mandate-scope matching and deny-override vectors
 - `must-coverage.md` — initial mapping from normative MUSTs to vectors

@@ -16,6 +16,6 @@ spec repo.
 | 6 | R1+ actions marked `simulate: true` MUST support SIMULATE | `manifest-act-pay-valid` |
 | 6 | Clients MUST simulate before any R2/R3 propose | `client-r3-propose-without-simulate`, `client-r3-propose-after-simulate` |
 | 7 | Expired offers MUST fail closed | `offer-expired-at-issue` |
-| 8.1 | Sites MUST verify mandate signature, validity, scope, caps, and revocation | `mandate-cap-exceeded` |
+| 8.1 | Sites MUST verify mandate signature, validity, scope, caps, and revocation | `mandate-cap-exceeded`, `scope-exact-commerce-purchase`, `scope-wildcard-commerce-purchase-child`, `scope-forbidden-exact-overrides-wildcard` |
 | 8.2 | Both parties MUST retain receipts | `receipt-valid-ticket-purchase` |
 | 9 | Fallback MUST NOT execute R2/R3-equivalent operations without human confirmation | `fallback-r3-without-human`, `fallback-r3-with-human` |

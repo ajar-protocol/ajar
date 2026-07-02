@@ -29,6 +29,7 @@ EXAMPLES = ROOT / "examples"
 TEST_VECTORS = ROOT / "test-vectors"
 
 from signing_profile import b64url, canonical_json_bytes, ed25519_verify, public_key, signing_payload, unb64url
+from scope_match import scope_allowed
 
 
 VALID_EXAMPLES = {
@@ -237,7 +238,8 @@ def validate_must_coverage() -> list[str]:
     failures: list[str] = []
     core_ids = {vector["id"] for vector in load_json(TEST_VECTORS / "core-vectors.json")["vectors"]}
     runtime_ids = {vector["id"] for vector in load_json(TEST_VECTORS / "runtime-vectors.json")["vectors"]}
-    vector_ids = core_ids | runtime_ids
+    scope_ids = {vector["id"] for vector in load_json(TEST_VECTORS / "scope-vectors.json")["vectors"]}
+    vector_ids = core_ids | runtime_ids | scope_ids
     text = (TEST_VECTORS / "must-coverage.md").read_text(encoding="utf-8")
     for token in re.findall(r"`([^`]+)`", text):
         if token.startswith("/") or token.endswith(".json"):
@@ -250,6 +252,28 @@ def validate_must_coverage() -> list[str]:
             continue
         if token not in vector_ids:
             failures.append(f"must-coverage.md references unknown vector id: {token}")
+    return failures
+
+
+def validate_scope_vectors() -> list[str]:
+    failures: list[str] = []
+    vectors = load_json(TEST_VECTORS / "scope-vectors.json")["vectors"]
+    seen_ids: set[str] = set()
+
+    for vector in vectors:
+        vector_id = vector["id"]
+        if vector_id in seen_ids:
+            failures.append(f"duplicate scope vector id: {vector_id}")
+        seen_ids.add(vector_id)
+
+        actual = "allow" if scope_allowed(
+            vector["mandate_scopes"],
+            vector["required_scope"],
+            vector.get("forbidden", []),
+        ) else "deny"
+        if actual != vector["expected"]:
+            failures.append(f"{vector_id} expected {vector['expected']} but got {actual}")
+
     return failures
 
 
@@ -317,6 +341,7 @@ def main() -> int:
         + validate_crypto_vectors()
         + validate_core_vectors()
         + validate_runtime_vectors()
+        + validate_scope_vectors()
         + validate_must_coverage()
     )
     if failures:
@@ -329,10 +354,11 @@ def main() -> int:
     crypto_count = len(load_json(TEST_VECTORS / "crypto-signing.json")["vectors"])
     core_count = len(load_json(TEST_VECTORS / "core-vectors.json")["vectors"])
     runtime_count = len(load_json(TEST_VECTORS / "runtime-vectors.json")["vectors"])
+    scope_count = len(load_json(TEST_VECTORS / "scope-vectors.json")["vectors"])
     print(
         f"Validated {valid_count} valid examples, {invalid_count} invalid examples, "
-        f"{crypto_count} signing vectors, {core_count} core vectors, and "
-        f"{runtime_count} runtime vectors."
+        f"{crypto_count} signing vectors, {core_count} core vectors, "
+        f"{runtime_count} runtime vectors, and {scope_count} scope vectors."
     )
     return 0
 

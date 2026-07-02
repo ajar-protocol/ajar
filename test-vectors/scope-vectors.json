@@ -1,0 +1,67 @@
+{
+  "ajar_version": "0.1",
+  "vectors": [
+    {
+      "id": "scope-exact-commerce-purchase",
+      "mandate_scopes": ["commerce.purchase.transport"],
+      "required_scope": "commerce.purchase.transport",
+      "expected": "allow"
+    },
+    {
+      "id": "scope-wildcard-commerce-purchase-child",
+      "mandate_scopes": ["commerce.purchase.*"],
+      "required_scope": "commerce.purchase.transport",
+      "expected": "allow"
+    },
+    {
+      "id": "scope-sibling-denied",
+      "mandate_scopes": ["commerce.purchase.transport"],
+      "required_scope": "commerce.purchase.event",
+      "expected": "deny"
+    },
+    {
+      "id": "scope-prefix-without-wildcard-denied",
+      "mandate_scopes": ["commerce.purchase"],
+      "required_scope": "commerce.purchase.transport",
+      "expected": "deny"
+    },
+    {
+      "id": "scope-forbidden-exact-overrides-wildcard",
+      "mandate_scopes": ["data.export.*"],
+      "forbidden": ["data.export.user"],
+      "required_scope": "data.export.user",
+      "expected": "deny"
+    },
+    {
+      "id": "scope-forbidden-wildcard-overrides-specific",
+      "mandate_scopes": ["commerce.purchase.transport"],
+      "forbidden": ["commerce.purchase.*"],
+      "required_scope": "commerce.purchase.transport",
+      "expected": "deny"
+    },
+    {
+      "id": "scope-invalid-middle-wildcard-denied",
+      "mandate_scopes": ["commerce.*.ticket"],
+      "required_scope": "commerce.purchase.transport",
+      "expected": "deny"
+    },
+    {
+      "id": "scope-private-does-not-match-core",
+      "mandate_scopes": ["x-demo.purchase.*"],
+      "required_scope": "commerce.purchase.transport",
+      "expected": "deny"
+    },
+    {
+      "id": "scope-private-matches-private",
+      "mandate_scopes": ["x-demo.purchase.*"],
+      "required_scope": "x-demo.purchase.priority",
+      "expected": "allow"
+    },
+    {
+      "id": "scope-core-does-not-match-private",
+      "mandate_scopes": ["commerce.purchase.*"],
+      "required_scope": "x-demo.purchase.priority",
+      "expected": "deny"
+    }
+  ]
+}
