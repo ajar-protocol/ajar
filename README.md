@@ -36,7 +36,8 @@ python3 tools/check_phase0.py
 Expected result:
 
 ```text
-Validated 10 valid examples, 5 invalid examples, 4 signing vectors, 2 HTTP signature vectors, 5 extension vectors, 4 manifest check vectors, 10 core vectors, 8 runtime vectors, and 10 scope vectors.
+Validated 10 valid examples, 6 invalid examples, 4 signing vectors, 2 HTTP signature vectors, 5 extension vectors, 5 manifest check vectors, 10 core vectors, 18 runtime vectors, and 10 scope vectors.
+MUST coverage OK: 21 requirements mapped.
 ```
 
 `make validate` runs schema/example/vector validation, local Markdown link

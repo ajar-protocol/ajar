@@ -16,6 +16,7 @@ jobs:
       - run: python -m pip install --upgrade pip
       - run: python -m pip install -r requirements-dev.txt
       - run: python3 tools/validate_examples.py
+      - run: python3 tools/check_must_coverage.py
       - run: python3 tools/check_links.py
       - run: python3 tools/check_markdown.py
       - run: python3 tools/check_phase0.py

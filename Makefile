@@ -1,8 +1,8 @@
-.PHONY: validate examples links markdown phase0 manifest-check
+.PHONY: validate examples must links markdown phase0 manifest-check
 
 PYTHON ?= python3
 
-validate: examples links markdown
+validate: examples must links markdown
 
 phase0:
 	$(PYTHON) tools/check_phase0.py
@@ -12,6 +12,9 @@ manifest-check:
 
 examples:
 	$(PYTHON) tools/validate_examples.py
+
+must:
+	$(PYTHON) tools/check_must_coverage.py
 
 links:
 	$(PYTHON) tools/check_links.py

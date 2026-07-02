@@ -34,6 +34,15 @@
         "valid": false,
         "contains": "two_phase"
       }
+    },
+    {
+      "id": "manifest-check-expired-invalid",
+      "manifest": "examples/invalid/expired-manifest/manifest.json",
+      "served_path": "/.well-known/ajar.json",
+      "expected": {
+        "valid": false,
+        "contains": "AJAR-VERIFY-EXPIRED"
+      }
     }
   ]
 }

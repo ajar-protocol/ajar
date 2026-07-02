@@ -1,0 +1,132 @@
+{
+  "ajar_version": "0.1",
+  "source": "docs/03-PROTOCOL-SPEC.md",
+  "requirements": [
+    {
+      "id": "must-extensibility-unknown-fields",
+      "section": "1",
+      "source_text": "4. **Extensibility:** every object carries `ajar_version` (semver); unknown fields MUST be ignored; extensions use `x-<vendor>-` prefixes; breaking changes bump major version; clients negotiate via the manifest's `supported_versions`.",
+      "vectors": ["extension-manifest-x-field-accepted", "extension-manifest-unprefixed-field-rejected"]
+    },
+    {
+      "id": "must-manifest-location",
+      "section": "2.1",
+      "source_text": "A conforming site MUST serve its manifest at:",
+      "vectors": ["http-manifest-well-known-location", "http-manifest-wrong-location"]
+    },
+    {
+      "id": "must-owner-key-domain-binding",
+      "section": "2.2",
+      "source_text": "- The **Owner Key** (Ed25519) is the site's root of authority. Its public half appears in the manifest AND MUST be provable against the domain via at least one of: DNS TXT record (`_ajar.<domain>`), or the TLS-served manifest itself plus transparency-log history (trust-on-first-use hardened by logs).",
+      "vectors": ["manifest-domain-binding-valid", "manifest-domain-binding-mismatch"]
+    },
+    {
+      "id": "must-agent-http-signatures",
+      "section": "2.3",
+      "source_text": "Agents MUST sign requests with HTTP Message Signatures (RFC 9421, `tag=\"ajar\"`), interoperable with Web Bot Auth: `Signature-Agent` points to the operator's key directory (`/.well-known/http-message-signatures-directory`). Anonymous access is at the owner's policy discretion (tier `anonymous`).",
+      "vectors": ["agent-request-signature-valid", "agent-request-signature-tampered-target"]
+    },
+    {
+      "id": "must-kid-resolution",
+      "section": "2.4",
+      "source_text": "5. Store the signer key id in `kid`. Verifiers MUST resolve `kid` from the relevant owner, operational, principal, or agent key directory before accepting the signature.",
+      "vectors": ["signature-kid-known", "signature-kid-unknown"]
+    },
+    {
+      "id": "must-manifest-expiry",
+      "section": "3",
+      "source_text": "\"expires_at\": \"2026-10-01T00:00:00Z\",               // manifests MUST expire (max 180d)",
+      "vectors": ["manifest-check-expired-invalid"]
+    },
+    {
+      "id": "must-view-provenance",
+      "section": "4",
+      "source_text": "- **Provenance:** every chunk is data, never instructions. Clients MUST tag chunks with origin and treat them as inert in model context (see 04-SECURITY-MODEL).",
+      "vectors": ["view-chunks-provenance-tagged", "view-chunk-executable-rejected"]
+    },
+    {
+      "id": "must-r1-simulate-flag",
+      "section": "5",
+      "source_text": "\"simulate\": true,                               // MUST be true for R1+ (§6)",
+      "vectors": ["manifest-act-pay-valid", "action-risk-floor-lowered"]
+    },
+    {
+      "id": "must-r1-idempotency-key",
+      "section": "5",
+      "source_text": "\"idempotency\": \"required\",                      // Idempotency-Key header, R1+ MUST",
+      "vectors": ["manifest-act-pay-valid", "action-risk-floor-lowered"]
+    },
+    {
+      "id": "must-simulate-same-input",
+      "section": "6",
+      "source_text": "Every action with `simulate: true` MUST accept the same input at:",
+      "vectors": ["simulate-endpoints-equivalent", "simulate-endpoints-diverged"]
+    },
+    {
+      "id": "must-simulate-equivalent-endpoints",
+      "section": "6",
+      "source_text": "(Equivalently `.../simulate` sub-resource; both MUST behave identically.)",
+      "vectors": ["simulate-endpoints-equivalent", "simulate-endpoints-diverged"]
+    },
+    {
+      "id": "must-client-simulate-before-propose",
+      "section": "6",
+      "source_text": "- Clients (Kernel) MUST simulate before any R2/R3 propose, and MUST re-check the *simulation result* — not the model's belief — against the mandate.",
+      "vectors": ["client-r3-propose-without-simulate", "client-r3-propose-after-simulate"]
+    },
+    {
+      "id": "must-expired-offer-fail-closed",
+      "section": "7",
+      "source_text": "3. Either side may **abort**; expired offers are void; commit of an expired/never-issued offer MUST fail closed.",
+      "vectors": ["offer-expired-at-issue"]
+    },
+    {
+      "id": "must-site-verify-mandate",
+      "section": "8.1",
+      "source_text": "- Sites MUST verify: signature, validity window, scope ⊇ action requirement, caps ≥ resolved cost, revocation check (best effort within `cached_ttl`).",
+      "vectors": ["mandate-valid-ticket-purchase", "mandate-cap-exceeded", "scope-exact-commerce-purchase", "scope-forbidden-exact-overrides-wildcard"]
+    },
+    {
+      "id": "must-retain-receipts",
+      "section": "8.2",
+      "source_text": "Dual-signed record: `{ receipt_id, offer (embedded), mandate_hash, result_summary, executed_at, site_signature, agent_signature }`. Both parties MUST retain receipts (site: per policy retention; kernel: Receipt Vault). Receipts are the atoms of dispute resolution and regulatory audit.",
+      "vectors": ["receipt-valid-ticket-purchase"]
+    },
+    {
+      "id": "must-fallback-rules",
+      "section": "9",
+      "source_text": "Clients MAY interact with non-Ajar sites via rendering/extraction, but MUST: honor robots.txt / AIPREF signals and 402 challenges; identify themselves via signed requests; flag all derived content `unverified`; and MUST NOT execute R2/R3-equivalent operations without explicit human confirmation per operation. Fallback is a transition path, not a peer mode.",
+      "vectors": ["fallback-r3-without-human", "fallback-r3-with-human"]
+    },
+    {
+      "id": "must-idempotency-header",
+      "section": "10",
+      "source_text": "| Idempotency | `Idempotency-Key: <uuid>` (R1+ MUST) |",
+      "vectors": ["manifest-act-pay-valid", "action-risk-floor-lowered"]
+    },
+    {
+      "id": "must-breaking-major-version",
+      "section": "13",
+      "source_text": "- Breaking changes MUST bump the major version and include a migration note.",
+      "vectors": ["breaking-change-major-bump", "breaking-change-without-major-bump"]
+    },
+    {
+      "id": "must-unknown-fields",
+      "section": "13",
+      "source_text": "- Unknown fields MUST be ignored unless they appear in an object position where the schema has `additionalProperties: false`.",
+      "vectors": ["extension-manifest-x-field-accepted", "extension-manifest-unprefixed-field-rejected"]
+    },
+    {
+      "id": "must-private-extension-prefix",
+      "section": "13",
+      "source_text": "- Private extensions MUST use `x-<vendor>-` prefixes for fields, scopes, adapters, and non-standard transports.",
+      "vectors": ["extension-action-x-field-accepted", "scope-private-matches-private", "scope-private-does-not-match-core"]
+    },
+    {
+      "id": "must-public-extension-aep",
+      "section": "13",
+      "source_text": "- Public extensions that affect interoperability MUST go through the AEP process.",
+      "vectors": ["public-extension-with-aep", "public-extension-without-aep"]
+    }
+  ]
+}

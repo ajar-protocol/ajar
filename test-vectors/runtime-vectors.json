@@ -29,6 +29,60 @@
       }
     },
     {
+      "id": "manifest-domain-binding-valid",
+      "spec_section": "2.2",
+      "kind": "domain_binding",
+      "input": {
+        "manifest_domain": "examplerail.example",
+        "request_domain": "examplerail.example",
+        "owner_key_present": true,
+        "proof": "dns-txt"
+      },
+      "expected": {
+        "verdict": "accept"
+      }
+    },
+    {
+      "id": "manifest-domain-binding-mismatch",
+      "spec_section": "2.2",
+      "kind": "domain_binding",
+      "input": {
+        "manifest_domain": "examplerail.example",
+        "request_domain": "attacker.example",
+        "owner_key_present": true,
+        "proof": "dns-txt"
+      },
+      "expected": {
+        "verdict": "reject",
+        "error_code": "AJAR-VERIFY-DOMAIN-BINDING"
+      }
+    },
+    {
+      "id": "signature-kid-known",
+      "spec_section": "2.4",
+      "kind": "kid_resolution",
+      "input": {
+        "kid": "owner-2026",
+        "known_kids": ["owner-2026", "content-2026-07"]
+      },
+      "expected": {
+        "verdict": "accept"
+      }
+    },
+    {
+      "id": "signature-kid-unknown",
+      "spec_section": "2.4",
+      "kind": "kid_resolution",
+      "input": {
+        "kid": "unknown-2026",
+        "known_kids": ["owner-2026", "content-2026-07"]
+      },
+      "expected": {
+        "verdict": "reject",
+        "error_code": "AJAR-VERIFY-UNKNOWN-KID"
+      }
+    },
+    {
       "id": "client-r3-propose-without-simulate",
       "spec_section": "6",
       "kind": "client_action_sequence",
@@ -53,6 +107,31 @@
       },
       "expected": {
         "verdict": "accept"
+      }
+    },
+    {
+      "id": "simulate-endpoints-equivalent",
+      "spec_section": "6",
+      "kind": "simulate_equivalence",
+      "input": {
+        "header_mode_hash": "sha256:simulationResultHash001",
+        "subresource_hash": "sha256:simulationResultHash001"
+      },
+      "expected": {
+        "verdict": "accept"
+      }
+    },
+    {
+      "id": "simulate-endpoints-diverged",
+      "spec_section": "6",
+      "kind": "simulate_equivalence",
+      "input": {
+        "header_mode_hash": "sha256:simulationResultHash001",
+        "subresource_hash": "sha256:differentSimulationResultHash001"
+      },
+      "expected": {
+        "verdict": "reject",
+        "error_code": "AJAR-SIMULATE-DIVERGED"
       }
     },
     {
@@ -102,6 +181,58 @@
       "expected": {
         "verdict": "reject",
         "error_code": "AJAR-CLIENT-PROVENANCE"
+      }
+    },
+    {
+      "id": "breaking-change-major-bump",
+      "spec_section": "13",
+      "kind": "version_change",
+      "input": {
+        "change": "breaking",
+        "old_version": "0.1",
+        "new_version": "1.0"
+      },
+      "expected": {
+        "verdict": "accept"
+      }
+    },
+    {
+      "id": "breaking-change-without-major-bump",
+      "spec_section": "13",
+      "kind": "version_change",
+      "input": {
+        "change": "breaking",
+        "old_version": "0.1",
+        "new_version": "0.2"
+      },
+      "expected": {
+        "verdict": "reject",
+        "error_code": "AJAR-VERSION-BREAKING"
+      }
+    },
+    {
+      "id": "public-extension-with-aep",
+      "spec_section": "13",
+      "kind": "aep_requirement",
+      "input": {
+        "affects_interoperability": true,
+        "aep_present": true
+      },
+      "expected": {
+        "verdict": "accept"
+      }
+    },
+    {
+      "id": "public-extension-without-aep",
+      "spec_section": "13",
+      "kind": "aep_requirement",
+      "input": {
+        "affects_interoperability": true,
+        "aep_present": false
+      },
+      "expected": {
+        "verdict": "reject",
+        "error_code": "AJAR-AEP-REQUIRED"
       }
     },
     {

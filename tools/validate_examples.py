@@ -129,6 +129,9 @@ def semantic_failure(case: dict, instance: dict, base_dir: Path) -> bool:
         last_seen = case.get("last_seen_sequence", case.get("state", {}).get("last_seen_sequence"))
         return int(instance["sequence"]) < int(last_seen)
 
+    if rule == "manifest-expired-at-issue":
+        return parse_dt(instance["expires_at"]) <= parse_dt(instance["issued_at"])
+
     raise ValueError(f"Unknown invalid semantic rule: {rule}")
 
 
@@ -420,10 +423,25 @@ def runtime_verdict(vector: dict) -> tuple[str, str | None]:
             return "accept", None
         return "reject", "AJAR-POLICY-DENIED"
 
+    if kind == "domain_binding":
+        if data["owner_key_present"] and data["manifest_domain"] == data["request_domain"] and data["proof"] in {"dns-txt", "transparency-log"}:
+            return "accept", None
+        return "reject", "AJAR-VERIFY-DOMAIN-BINDING"
+
+    if kind == "kid_resolution":
+        if data["kid"] in data["known_kids"]:
+            return "accept", None
+        return "reject", "AJAR-VERIFY-UNKNOWN-KID"
+
     if kind == "client_action_sequence":
         if data["attempted_mode"] == "propose" and data["action_risk"] in {"R2", "R3"} and not data["prior_simulation"]:
             return "reject", "AJAR-SIMULATE-REQUIRED"
         return "accept", None
+
+    if kind == "simulate_equivalence":
+        if data["header_mode_hash"] == data["subresource_hash"]:
+            return "accept", None
+        return "reject", "AJAR-SIMULATE-DIVERGED"
 
     if kind == "view_provenance":
         view = load_json(ROOT / data["view"])
@@ -443,6 +461,18 @@ def runtime_verdict(vector: dict) -> tuple[str, str | None]:
         ):
             return "reject", "AJAR-FALLBACK-HUMAN-REQUIRED"
         return "accept", None
+
+    if kind == "version_change":
+        old_major = int(data["old_version"].split(".", 1)[0])
+        new_major = int(data["new_version"].split(".", 1)[0])
+        if data["change"] != "breaking" or new_major > old_major:
+            return "accept", None
+        return "reject", "AJAR-VERSION-BREAKING"
+
+    if kind == "aep_requirement":
+        if not data["affects_interoperability"] or data["aep_present"]:
+            return "accept", None
+        return "reject", "AJAR-AEP-REQUIRED"
 
     raise ValueError(f"Unknown runtime vector kind: {kind}")
 

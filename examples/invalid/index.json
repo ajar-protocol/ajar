@@ -38,6 +38,15 @@
       "why": "Current manifest sequence 41 is lower than the last accepted sequence 42."
     },
     {
+      "id": "expired-manifest",
+      "path": "expired-manifest/manifest.json",
+      "schema": "manifest.schema.json",
+      "expected": "semantic-fail",
+      "rule": "manifest-expired-at-issue",
+      "error_code": "AJAR-VERIFY-EXPIRED",
+      "why": "expires_at is earlier than issued_at."
+    },
+    {
       "id": "risk-floor-lowered",
       "path": "risk-floor/manifest.json",
       "schema": "manifest.schema.json",

@@ -30,6 +30,8 @@ Servers SHOULD also send the `Ajar-Error-Code` HTTP header with the same value.
 | `AJAR-ACTION-RISK-FLOOR` | 409 | Action attempts to lower required ceremony below risk floor |
 | `AJAR-SIMULATE-REQUIRED` | 409 | Required SIMULATE step is missing |
 | `AJAR-SIMULATE-DIVERGED` | 409 | Offer materially diverges from the simulation result |
+| `AJAR-VERSION-BREAKING` | 409 | Breaking change did not bump the major version |
+| `AJAR-AEP-REQUIRED` | 409 | Interoperability-affecting public extension did not follow the AEP process |
 | `AJAR-OFFER-NOT-FOUND` | 404 | Offer id was never issued or is not visible to caller |
 | `AJAR-OFFER-EXPIRED` | 409 | Commit attempted after offer expiry |
 | `AJAR-OFFER-REPLAY` | 409 | Offer has already been committed or aborted |

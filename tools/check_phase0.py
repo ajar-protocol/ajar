@@ -97,6 +97,7 @@ def check_examples_and_vectors(failures: list[str]) -> None:
         "extension-vectors.json",
         "http-signature-vectors.json",
         "manifest-check-vectors.json",
+        "must-coverage.json",
         "runtime-vectors.json",
         "scope-vectors.json",
     ]
@@ -105,8 +106,9 @@ def check_examples_and_vectors(failures: list[str]) -> None:
         if not path.exists():
             failures.append(f"missing vector file: {filename}")
             continue
-        vectors = load_json(path).get("vectors", [])
-        if not vectors:
+        data = load_json(path)
+        entries = data.get("vectors", data.get("requirements", []))
+        if not entries:
             failures.append(f"vector file has no vectors: {filename}")
 
     coverage = (ROOT / "test-vectors" / "must-coverage.md").read_text(encoding="utf-8")
@@ -120,9 +122,11 @@ def check_local_validation(failures: list[str]) -> None:
     except subprocess.CalledProcessError as exc:
         failures.append(f"make validate failed:\n{exc.stdout}\n{exc.stderr}")
         return
-    expected = "Validated 10 valid examples, 5 invalid examples, 4 signing vectors, 2 HTTP signature vectors, 5 extension vectors, 4 manifest check vectors, 10 core vectors, 8 runtime vectors, and 10 scope vectors."
+    expected = "Validated 10 valid examples, 6 invalid examples, 4 signing vectors, 2 HTTP signature vectors, 5 extension vectors, 5 manifest check vectors, 10 core vectors, 18 runtime vectors, and 10 scope vectors."
     if expected not in output:
         failures.append("make validate output did not include expected vector summary")
+    if "MUST coverage OK: 21 requirements mapped." not in output:
+        failures.append("make validate output did not include expected MUST coverage summary")
 
 
 def main() -> int:
