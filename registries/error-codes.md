@@ -34,6 +34,7 @@ Servers SHOULD also send the `Ajar-Error-Code` HTTP header with the same value.
 | `AJAR-OFFER-EXPIRED` | 409 | Commit attempted after offer expiry |
 | `AJAR-OFFER-REPLAY` | 409 | Offer has already been committed or aborted |
 | `AJAR-COMMIT-BAD-BINDING` | 401 | Commit signature does not bind offer and mandate hashes |
+| `AJAR-CLIENT-PROVENANCE` | 409 | Client failed to preserve provenance-tagged inert View chunks |
 | `AJAR-METERING-PAYMENT-REQUIRED` | 402 | Payment or settlement proof is required |
 | `AJAR-METERING-SETTLEMENT-FAILED` | 402 | Settlement adapter rejected the proof |
 | `AJAR-FALLBACK-HUMAN-REQUIRED` | 409 | Manifest-less R2/R3-equivalent operation requires explicit human confirmation |

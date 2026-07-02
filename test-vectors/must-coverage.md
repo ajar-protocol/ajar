@@ -8,10 +8,10 @@ spec repo.
 | Spec section | Normative requirement | Vector |
 |---|---|---|
 | 2.1 | A conforming site MUST serve its manifest at `/.well-known/ajar.json` | `http-manifest-well-known-location`, `http-manifest-wrong-location` |
-| 2.3 | Agents MUST sign requests with HTTP Message Signatures | harness follow-up: HTTP signature vector |
+| 2.3 | Agents MUST sign requests with HTTP Message Signatures | `agent-request-signature-valid`, `agent-request-signature-tampered-target` |
 | 2.4 | Durable artifacts MUST use the canonical signing profile | `crypto-signing.json`, `manifest-bad-signature-shape` |
 | 3 | Invalid manifest verification MUST fail closed to fallback | `manifest-bad-signature-shape`, `manifest-sequence-rollback` |
-| 4 | Clients MUST treat chunks as inert data with provenance | harness follow-up: client runtime vector |
+| 4 | Clients MUST treat chunks as inert data with provenance | `view-chunks-provenance-tagged`, `view-chunk-executable-rejected` |
 | 5.1 | Owner policy may never lower risk-class protocol floors | `action-risk-floor-lowered` |
 | 6 | R1+ actions marked `simulate: true` MUST support SIMULATE | `manifest-act-pay-valid` |
 | 6 | Clients MUST simulate before any R2/R3 propose | `client-r3-propose-without-simulate`, `client-r3-propose-after-simulate` |

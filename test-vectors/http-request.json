@@ -1,0 +1,8 @@
+{
+  "method": "GET",
+  "target_uri": "https://examplerail.example/.well-known/ajar.json",
+  "headers": {
+    "signature-agent": "https://agent.example/.well-known/http-message-signatures-directory",
+    "ajar-date": "2026-07-20T10:00:00Z"
+  }
+}

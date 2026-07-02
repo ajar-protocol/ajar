@@ -56,6 +56,55 @@
       }
     },
     {
+      "id": "view-chunks-provenance-tagged",
+      "spec_section": "4",
+      "kind": "view_provenance",
+      "input": {
+        "view": "examples/views/blog-home.view.json",
+        "origin": "https://notes.example",
+        "chunks": [
+          {
+            "id": "home.title",
+            "origin": "https://notes.example",
+            "inert": true
+          },
+          {
+            "id": "home.summary",
+            "origin": "https://notes.example",
+            "inert": true
+          }
+        ]
+      },
+      "expected": {
+        "verdict": "accept"
+      }
+    },
+    {
+      "id": "view-chunk-executable-rejected",
+      "spec_section": "4",
+      "kind": "view_provenance",
+      "input": {
+        "view": "examples/views/blog-home.view.json",
+        "origin": "https://notes.example",
+        "chunks": [
+          {
+            "id": "home.title",
+            "origin": "https://notes.example",
+            "inert": true
+          },
+          {
+            "id": "home.summary",
+            "origin": "https://notes.example",
+            "inert": false
+          }
+        ]
+      },
+      "expected": {
+        "verdict": "reject",
+        "error_code": "AJAR-CLIENT-PROVENANCE"
+      }
+    },
+    {
       "id": "fallback-r3-without-human",
       "spec_section": "9",
       "kind": "fallback_operation",

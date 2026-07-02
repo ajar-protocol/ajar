@@ -30,6 +30,7 @@ TEST_VECTORS = ROOT / "test-vectors"
 
 from signing_profile import b64url, canonical_json_bytes, ed25519_verify, public_key, signing_payload, unb64url
 from scope_match import scope_allowed
+from http_signature import sign_request, verify_request
 
 
 VALID_EXAMPLES = {
@@ -166,6 +167,57 @@ def validate_crypto_vectors() -> list[str]:
     return failures
 
 
+def validate_http_signature_vectors() -> list[str]:
+    failures: list[str] = []
+    vectors = load_json(TEST_VECTORS / "http-signature-vectors.json")["vectors"]
+    error_registry = (ROOT / "registries" / "error-codes.md").read_text(encoding="utf-8")
+    seen_ids: set[str] = set()
+
+    for vector in vectors:
+        vector_id = vector["id"]
+        if vector_id in seen_ids:
+            failures.append(f"duplicate HTTP signature vector id: {vector_id}")
+        seen_ids.add(vector_id)
+
+        request = load_json(ROOT / vector["request"])
+        request.update(vector.get("mutate", {}))
+
+        if "seed_hex" in vector:
+            generated = sign_request(
+                request,
+                bytes.fromhex(vector["seed_hex"]),
+                vector["covered"],
+                int(vector["created"]),
+                vector["keyid"],
+            )
+            for field in ["public_key_b64url", "signature_input", "signature", "signature_b64url", "signature_base"]:
+                if generated[field] != vector[field]:
+                    failures.append(f"{vector_id} {field} changed")
+
+        verified = verify_request(
+            request,
+            vector["public_key_b64url"],
+            vector["signature_b64url"],
+            vector["covered"],
+            int(vector["created"]),
+            vector["keyid"],
+        )
+        actual_verdict = "accept" if verified else "reject"
+        expected = vector["expected"]
+        if actual_verdict != expected["verdict"]:
+            failures.append(f"{vector_id} expected {expected['verdict']} but got {actual_verdict}")
+            continue
+
+        if actual_verdict == "reject":
+            error_code = expected.get("error_code")
+            if not error_code:
+                failures.append(f"{vector_id} reject vector is missing error_code")
+            elif error_code not in error_registry:
+                failures.append(f"{vector_id} references unknown error code: {error_code}")
+
+    return failures
+
+
 def validate_core_vectors() -> list[str]:
     failures: list[str] = []
     vectors = load_json(TEST_VECTORS / "core-vectors.json")["vectors"]
@@ -239,7 +291,8 @@ def validate_must_coverage() -> list[str]:
     core_ids = {vector["id"] for vector in load_json(TEST_VECTORS / "core-vectors.json")["vectors"]}
     runtime_ids = {vector["id"] for vector in load_json(TEST_VECTORS / "runtime-vectors.json")["vectors"]}
     scope_ids = {vector["id"] for vector in load_json(TEST_VECTORS / "scope-vectors.json")["vectors"]}
-    vector_ids = core_ids | runtime_ids | scope_ids
+    http_ids = {vector["id"] for vector in load_json(TEST_VECTORS / "http-signature-vectors.json")["vectors"]}
+    vector_ids = core_ids | runtime_ids | scope_ids | http_ids
     text = (TEST_VECTORS / "must-coverage.md").read_text(encoding="utf-8")
     for token in re.findall(r"`([^`]+)`", text):
         if token.startswith("/") or token.endswith(".json"):
@@ -291,6 +344,16 @@ def runtime_verdict(vector: dict) -> tuple[str, str | None]:
             return "reject", "AJAR-SIMULATE-REQUIRED"
         return "accept", None
 
+    if kind == "view_provenance":
+        view = load_json(ROOT / data["view"])
+        chunk_ids = {chunk["id"] for chunk in view["chunks"]}
+        for chunk in data["chunks"]:
+            if chunk["id"] not in chunk_ids:
+                return "reject", "AJAR-CLIENT-PROVENANCE"
+            if chunk["origin"] != data["origin"] or not chunk["inert"]:
+                return "reject", "AJAR-CLIENT-PROVENANCE"
+        return "accept", None
+
     if kind == "fallback_operation":
         if (
             not data["manifest_present"]
@@ -339,6 +402,7 @@ def main() -> int:
         validate_valid_examples(store)
         + validate_invalid_examples(store)
         + validate_crypto_vectors()
+        + validate_http_signature_vectors()
         + validate_core_vectors()
         + validate_runtime_vectors()
         + validate_scope_vectors()
@@ -352,12 +416,13 @@ def main() -> int:
     valid_count = sum(len(paths) for paths in VALID_EXAMPLES.values())
     invalid_count = len(load_json(EXAMPLES / "invalid" / "index.json")["cases"])
     crypto_count = len(load_json(TEST_VECTORS / "crypto-signing.json")["vectors"])
+    http_count = len(load_json(TEST_VECTORS / "http-signature-vectors.json")["vectors"])
     core_count = len(load_json(TEST_VECTORS / "core-vectors.json")["vectors"])
     runtime_count = len(load_json(TEST_VECTORS / "runtime-vectors.json")["vectors"])
     scope_count = len(load_json(TEST_VECTORS / "scope-vectors.json")["vectors"])
     print(
         f"Validated {valid_count} valid examples, {invalid_count} invalid examples, "
-        f"{crypto_count} signing vectors, {core_count} core vectors, "
+        f"{crypto_count} signing vectors, {http_count} HTTP signature vectors, {core_count} core vectors, "
         f"{runtime_count} runtime vectors, and {scope_count} scope vectors."
     )
     return 0

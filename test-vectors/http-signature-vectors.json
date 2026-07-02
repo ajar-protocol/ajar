@@ -1,0 +1,39 @@
+{
+  "ajar_version": "0.1",
+  "vectors": [
+    {
+      "id": "agent-request-signature-valid",
+      "spec_section": "2.3",
+      "request": "test-vectors/http-request.json",
+      "covered": ["@method", "@target-uri", "signature-agent", "ajar-date"],
+      "created": 1784532000,
+      "keyid": "agent-2026",
+      "seed_hex": "808182838485868788898a8b8c8d8e8f909192939495969798999a9b9c9d9e9f",
+      "public_key_b64url": "zRSzf5VulTGU_3-3Oz2B3MVh1hp1OAlLfD4aZD7l86o",
+      "signature_input": "ajar=(\"@method\" \"@target-uri\" \"signature-agent\" \"ajar-date\");created=1784532000;keyid=\"agent-2026\";tag=\"ajar\";alg=\"ed25519\"",
+      "signature": "ajar=:ZsuyBEnbynlJotKfDIixMI4mUF6Xhl1uxbwglP8Ak3dZNgWEy9fBdOPFKQPn92_rPDvvBWBh3_RNtbl-64zIAg:",
+      "signature_b64url": "ZsuyBEnbynlJotKfDIixMI4mUF6Xhl1uxbwglP8Ak3dZNgWEy9fBdOPFKQPn92_rPDvvBWBh3_RNtbl-64zIAg",
+      "signature_base": "\"@method\": GET\n\"@target-uri\": https://examplerail.example/.well-known/ajar.json\n\"signature-agent\": https://agent.example/.well-known/http-message-signatures-directory\n\"ajar-date\": 2026-07-20T10:00:00Z\n\"@signature-params\": (\"@method\" \"@target-uri\" \"signature-agent\" \"ajar-date\");created=1784532000;keyid=\"agent-2026\";tag=\"ajar\";alg=\"ed25519\"",
+      "expected": {
+        "verdict": "accept"
+      }
+    },
+    {
+      "id": "agent-request-signature-tampered-target",
+      "spec_section": "2.3",
+      "request": "test-vectors/http-request.json",
+      "covered": ["@method", "@target-uri", "signature-agent", "ajar-date"],
+      "created": 1784532000,
+      "keyid": "agent-2026",
+      "public_key_b64url": "zRSzf5VulTGU_3-3Oz2B3MVh1hp1OAlLfD4aZD7l86o",
+      "signature_b64url": "ZsuyBEnbynlJotKfDIixMI4mUF6Xhl1uxbwglP8Ak3dZNgWEy9fBdOPFKQPn92_rPDvvBWBh3_RNtbl-64zIAg",
+      "mutate": {
+        "target_uri": "https://examplerail.example/ajar.json"
+      },
+      "expected": {
+        "verdict": "reject",
+        "error_code": "AJAR-VERIFY-BAD-SIGNATURE"
+      }
+    }
+  ]
+}
