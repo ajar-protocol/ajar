@@ -61,7 +61,7 @@ follow-up markers. One deferral was recorded as OQ-6 below.
 | T0.7 conformance vectors | `test-vectors/*.json`, `test-vectors/must-coverage.json`, `test-vectors/must-coverage.md` | Local evidence complete for seed vectors |
 | T0.8 version and extension policy | `docs/03-PROTOCOL-SPEC.md` section 13, `test-vectors/extension-vectors.json`, `test-vectors/runtime-vectors.json` | Local evidence complete |
 | T0.9 repo scaffolding and CI | `.github/`, `SECURITY.md`, `CODE_OF_CONDUCT.md`, `CONTRIBUTING.md`, `LICENSE.md`, `.github/workflows/validate.yml`, `ci/validate.yml` | Complete; hosted validation green |
-| T0.10 ADR closure | `DECISIONS.md` ADR-001 through ADR-017 accepted | Local evidence complete |
+| T0.10 ADR closure | `DECISIONS.md` ADR-001 through ADR-018 accepted | Local evidence complete |
 
 ## Deferred Open Questions
 
