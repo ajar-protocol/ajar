@@ -14,7 +14,7 @@ Ajar is an owner-controlled semantic layer over HTTPS. It defines a signed Capab
 | `docs/05-OWNER-CONTROL.md` | Owner-control policy model |
 | `docs/01-RESEARCH.md` | Prior-art landscape and the honest novelty delta |
 | `GLOSSARY.md` | Canonical terminology |
-| `DECISIONS.md` | ADRs 001–018: why everything is the way it is |
+| `DECISIONS.md` | ADRs 001–019: why everything is the way it is |
 | `schemas/` | JSON Schemas for manifests, views, actions, mandates, offers, receipts, policies, errors, and simulations |
 | `examples/` | Golden examples, valid + deliberately invalid |
 | `registries/` | Scope registry, error codes, settlement adapters |
