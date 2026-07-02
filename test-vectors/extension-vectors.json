@@ -1,0 +1,84 @@
+{
+  "ajar_version": "0.1",
+  "vectors": [
+    {
+      "id": "extension-manifest-x-field-accepted",
+      "spec_section": "13",
+      "schema": "manifest.schema.json",
+      "input": "examples/manifests/blog-core.json",
+      "add": [
+        {
+          "path": "/x-demo-note",
+          "value": "private extension fields are ignored by generic clients"
+        }
+      ],
+      "expected": {
+        "verdict": "accept"
+      }
+    },
+    {
+      "id": "extension-manifest-unprefixed-field-rejected",
+      "spec_section": "13",
+      "schema": "manifest.schema.json",
+      "input": "examples/manifests/blog-core.json",
+      "add": [
+        {
+          "path": "/demo_note",
+          "value": "unprefixed unknown field"
+        }
+      ],
+      "expected": {
+        "verdict": "reject"
+      }
+    },
+    {
+      "id": "extension-action-x-field-accepted",
+      "spec_section": "13",
+      "schema": "manifest.schema.json",
+      "input": "examples/manifests/commerce-core-act-pay.json",
+      "add": [
+        {
+          "path": "/actions/0/x-demo-ui-hint",
+          "value": "display as compact search action"
+        }
+      ],
+      "expected": {
+        "verdict": "accept"
+      }
+    },
+    {
+      "id": "extension-offer-x-field-accepted",
+      "spec_section": "13",
+      "schema": "offer.schema.json",
+      "input": "examples/scenario-tickets/offer.json",
+      "add": [
+        {
+          "path": "/x-demo-settlement-note",
+          "value": {
+            "rail": "offline-invoice"
+          }
+        }
+      ],
+      "expected": {
+        "verdict": "accept"
+      }
+    },
+    {
+      "id": "extension-offer-unprefixed-field-rejected",
+      "spec_section": "13",
+      "schema": "offer.schema.json",
+      "input": "examples/scenario-tickets/offer.json",
+      "add": [
+        {
+          "path": "/settlement_note",
+          "value": {
+            "rail": "offline-invoice"
+          }
+        }
+      ],
+      "expected": {
+        "verdict": "reject"
+      }
+    }
+  ]
+}

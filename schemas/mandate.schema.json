@@ -94,5 +94,8 @@
     },
     "signature": { "$ref": "common.schema.json#/$defs/signature" }
   },
+  "patternProperties": {
+    "^x-[a-z0-9-]+-.+$": true
+  },
   "additionalProperties": false
 }

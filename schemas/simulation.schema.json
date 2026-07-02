@@ -25,5 +25,8 @@
     },
     "warnings": { "type": "array", "items": { "type": "string" } }
   },
+  "patternProperties": {
+    "^x-[a-z0-9-]+-.+$": true
+  },
   "additionalProperties": false
 }

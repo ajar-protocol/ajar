@@ -19,3 +19,4 @@ spec repo.
 | 8.1 | Sites MUST verify mandate signature, validity, scope, caps, and revocation | `mandate-cap-exceeded`, `scope-exact-commerce-purchase`, `scope-wildcard-commerce-purchase-child`, `scope-forbidden-exact-overrides-wildcard` |
 | 8.2 | Both parties MUST retain receipts | `receipt-valid-ticket-purchase` |
 | 9 | Fallback MUST NOT execute R2/R3-equivalent operations without human confirmation | `fallback-r3-without-human`, `fallback-r3-with-human` |
+| 13 | Private extensions MUST use `x-<vendor>-` prefixes | `extension-manifest-x-field-accepted`, `extension-manifest-unprefixed-field-rejected`, `extension-action-x-field-accepted`, `extension-offer-x-field-accepted`, `extension-offer-unprefixed-field-rejected` |

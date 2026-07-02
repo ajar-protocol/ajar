@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import json
 import hashlib
+import copy
 import sys
 import warnings
 from datetime import datetime
@@ -52,6 +53,34 @@ VALID_EXAMPLES = {
 def load_json(path: Path) -> dict:
     with path.open("r", encoding="utf-8") as handle:
         return json.load(handle)
+
+
+def apply_json_pointer_add(instance: dict, pointer: str, value: object) -> None:
+    if not pointer.startswith("/"):
+        raise ValueError(f"JSON pointer must start with /: {pointer}")
+    target: object = instance
+    parts = [part.replace("~1", "/").replace("~0", "~") for part in pointer.lstrip("/").split("/")]
+    for part in parts[:-1]:
+        if isinstance(target, list):
+            target = target[int(part)]
+        elif isinstance(target, dict):
+            target = target[part]
+        else:
+            raise ValueError(f"Cannot descend into pointer segment {part!r}")
+    leaf = parts[-1]
+    if isinstance(target, list):
+        target.insert(int(leaf), value)
+    elif isinstance(target, dict):
+        target[leaf] = value
+    else:
+        raise ValueError(f"Cannot set pointer leaf {leaf!r}")
+
+
+def vector_instance(vector: dict) -> dict:
+    instance = copy.deepcopy(load_json(ROOT / vector["input"]))
+    for addition in vector.get("add", []):
+        apply_json_pointer_add(instance, addition["path"], addition["value"])
+    return instance
 
 
 def load_schemas() -> dict[str, dict]:
@@ -218,6 +247,28 @@ def validate_http_signature_vectors() -> list[str]:
     return failures
 
 
+def validate_extension_vectors() -> list[str]:
+    failures: list[str] = []
+    vectors = load_json(TEST_VECTORS / "extension-vectors.json")["vectors"]
+    store = load_schemas()
+    seen_ids: set[str] = set()
+
+    for vector in vectors:
+        vector_id = vector["id"]
+        if vector_id in seen_ids:
+            failures.append(f"duplicate extension vector id: {vector_id}")
+        seen_ids.add(vector_id)
+
+        instance = vector_instance(vector)
+        errors = collect_errors(validator_for(vector["schema"], store), instance)
+        verdict = "reject" if errors else "accept"
+        if verdict != vector["expected"]["verdict"]:
+            detail = "\n  " + "\n  ".join(errors) if errors else ""
+            failures.append(f"{vector_id} expected {vector['expected']['verdict']} but got {verdict}{detail}")
+
+    return failures
+
+
 def validate_core_vectors() -> list[str]:
     failures: list[str] = []
     vectors = load_json(TEST_VECTORS / "core-vectors.json")["vectors"]
@@ -292,7 +343,8 @@ def validate_must_coverage() -> list[str]:
     runtime_ids = {vector["id"] for vector in load_json(TEST_VECTORS / "runtime-vectors.json")["vectors"]}
     scope_ids = {vector["id"] for vector in load_json(TEST_VECTORS / "scope-vectors.json")["vectors"]}
     http_ids = {vector["id"] for vector in load_json(TEST_VECTORS / "http-signature-vectors.json")["vectors"]}
-    vector_ids = core_ids | runtime_ids | scope_ids | http_ids
+    extension_ids = {vector["id"] for vector in load_json(TEST_VECTORS / "extension-vectors.json")["vectors"]}
+    vector_ids = core_ids | runtime_ids | scope_ids | http_ids | extension_ids
     text = (TEST_VECTORS / "must-coverage.md").read_text(encoding="utf-8")
     for token in re.findall(r"`([^`]+)`", text):
         if token.startswith("/") or token.endswith(".json"):
@@ -302,6 +354,8 @@ def validate_must_coverage() -> list[str]:
         if ":" in token or " " in token:
             continue
         if token.startswith("http") or token.startswith("Idempotency-Key"):
+            continue
+        if "<" in token or ">" in token:
             continue
         if token not in vector_ids:
             failures.append(f"must-coverage.md references unknown vector id: {token}")
@@ -403,6 +457,7 @@ def main() -> int:
         + validate_invalid_examples(store)
         + validate_crypto_vectors()
         + validate_http_signature_vectors()
+        + validate_extension_vectors()
         + validate_core_vectors()
         + validate_runtime_vectors()
         + validate_scope_vectors()
@@ -417,12 +472,14 @@ def main() -> int:
     invalid_count = len(load_json(EXAMPLES / "invalid" / "index.json")["cases"])
     crypto_count = len(load_json(TEST_VECTORS / "crypto-signing.json")["vectors"])
     http_count = len(load_json(TEST_VECTORS / "http-signature-vectors.json")["vectors"])
+    extension_count = len(load_json(TEST_VECTORS / "extension-vectors.json")["vectors"])
     core_count = len(load_json(TEST_VECTORS / "core-vectors.json")["vectors"])
     runtime_count = len(load_json(TEST_VECTORS / "runtime-vectors.json")["vectors"])
     scope_count = len(load_json(TEST_VECTORS / "scope-vectors.json")["vectors"])
     print(
         f"Validated {valid_count} valid examples, {invalid_count} invalid examples, "
-        f"{crypto_count} signing vectors, {http_count} HTTP signature vectors, {core_count} core vectors, "
+        f"{crypto_count} signing vectors, {http_count} HTTP signature vectors, "
+        f"{extension_count} extension vectors, {core_count} core vectors, "
         f"{runtime_count} runtime vectors, and {scope_count} scope vectors."
     )
     return 0

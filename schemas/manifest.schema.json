@@ -167,5 +167,8 @@
       "then": { "required": ["metering"] }
     }
   ],
+  "patternProperties": {
+    "^x-[a-z0-9-]+-.+$": true
+  },
   "additionalProperties": false
 }
