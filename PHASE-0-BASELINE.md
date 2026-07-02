@@ -16,6 +16,7 @@ This file records the local evidence for the v0.1 draft specification baseline.
 - Contribution rules: `CONTRIBUTING.md`
 - Local validation: `make validate`
 - Phase 0 readiness: `python3 tools/check_phase0.py`
+- Hosted validation: `.github/workflows/validate.yml`
 
 ## Current Validation Summary
 
@@ -34,11 +35,11 @@ Markdown hygiene OK.
 Phase 0 readiness OK.
 ```
 
-## External Dependency
+## Hosted Validation
 
-The hosted workflow file is not active yet because the current publishing token
-does not have workflow permission. The workflow template is present at
-`ci/validate.yml` and runs the same local checks.
+The hosted validation workflow is present at `.github/workflows/validate.yml`.
+The copy at `ci/validate.yml` is retained as a reviewable template and runs the
+same checks.
 
 ## Phase 0 Scope Boundary
 

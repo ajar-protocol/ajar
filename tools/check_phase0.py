@@ -64,6 +64,7 @@ def check_required_files(failures: list[str]) -> None:
         "test-vectors/must-coverage.md",
         "PHASE-0-REVIEW.md",
         "CONTRIBUTING.md",
+        ".github/workflows/validate.yml",
         "ci/validate.yml",
         "SECURITY.md",
         "CODE_OF_CONDUCT.md",

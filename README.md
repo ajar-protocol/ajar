@@ -43,11 +43,9 @@ MUST coverage OK: 21 requirements mapped.
 ```
 
 `make validate` runs schema/example/vector validation, local Markdown link
-checks, and Markdown hygiene checks.
-
-The workflow template is in `ci/validate.yml`. Copy it to
-`.github/workflows/validate.yml` once the publishing account has workflow
-permission enabled.
+checks, and Markdown hygiene checks. The same checks run in the hosted
+validation workflow at `.github/workflows/validate.yml`; `ci/validate.yml` is
+kept as a reviewable template copy.
 
 ## Changing the protocol
 Use AEPs; see `AEPs/README.md`. Anyone may propose changes, including independent implementers. Editorial fixes go by normal PR. Anything touching a MUST goes through an AEP.
