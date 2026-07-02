@@ -9,7 +9,7 @@ MUST pass their schemas. Invalid examples MUST fail for the documented rule in
 Contents:
 
 - `manifests/` — blog CORE, docs CORE+PAY, commerce CORE+ACT+PAY
-- `implementer-manifests/` — two additional valid manifests written as independent implementer-style fixtures
+- `implementer-manifests/` — four valid manifests written as independent implementer-style fixtures, including the two Phase 0 reader-exercise manifests (mosskiln-reader-a, thistledown-reader-b)
 - `views/` — signed semantic View example
 - `policies/` — owner policy example
 - `errors/` — RFC 9457 problem example

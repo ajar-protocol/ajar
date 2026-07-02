@@ -1,0 +1,245 @@
+{
+  "ajar_version": "0.1",
+  "supported_versions": ["0.1"],
+  "profiles": ["CORE", "ACT", "PAY"],
+  "site": {
+    "name": "Thistledown Seed Exchange",
+    "domain": "thistledown-seeds.example",
+    "description": "Heirloom and open-pollinated seed exchange: a searchable living catalog of regionally adapted seed lots, temporary lot reservations for growers, and purchase of curated seed bundles with germination-alert subscriptions.",
+    "languages": ["en", "en-GB", "cy"],
+    "legal_entity": "Thistledown Seed Exchange CIC",
+    "contact": "agents@thistledown-seeds.example"
+  },
+  "x-thistledown-grower-network": "https://thistledown-seeds.example/growers",
+  "keys": {
+    "owner": {
+      "kty": "OKP",
+      "crv": "Ed25519",
+      "x": "1nqqL0YwKlMBxhpHcvA98RicnWDeawOexlBKNJLVn0E",
+      "kid": "thistledown-owner-2026"
+    },
+    "operational": [
+      {
+        "key": {
+          "kty": "OKP",
+          "crv": "Ed25519",
+          "x": "B2KAkcBrufgEHVSUBPNyejV0dMp_2zmcsAs1g9pVmpo",
+          "kid": "thistledown-ops-2026-q3"
+        },
+        "scope": ["content-signing", "offer-signing", "receipt-signing"],
+        "valid_until": "2026-09-30T00:00:00Z",
+        "certification": {
+          "alg": "Ed25519",
+          "kid": "thistledown-owner-2026",
+          "sig": "WXqs2vcIJSM8l-bTWjnMYLlaMVjEZNbOaEq8oSZL1eI0flSqUm562I1oZysL3NQpMUCa43LvG2LBnRd3jQ3x3g"
+        }
+      }
+    ]
+  },
+  "views": {
+    "negotiation": ["application/ajar+json", "text/markdown"],
+    "index": "/ajar/views/index",
+    "chunking": { "stable_ids": true, "diff": "etag-per-chunk" },
+    "license": {
+      "read": "allowed",
+      "train": "denied",
+      "terms": "/ajar/license"
+    }
+  },
+  "actions": [
+    {
+      "id": "search_seed_catalog",
+      "title": "Search the heirloom seed catalog",
+      "risk": "R0",
+      "input_schema": {
+        "type": "object",
+        "required": ["query"],
+        "properties": {
+          "query": { "type": "string", "minLength": 1 },
+          "hardiness_zone": { "type": "string", "pattern": "^[0-9]{1,2}[ab]?$" },
+          "sowing_month": { "type": "integer", "minimum": 1, "maximum": 12 },
+          "open_pollinated_only": { "type": "boolean" }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": ["lots"],
+        "properties": {
+          "lots": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["lot_id", "variety", "species", "packets_available"],
+              "properties": {
+                "lot_id": { "type": "string" },
+                "variety": { "type": "string" },
+                "species": { "type": "string" },
+                "packets_available": { "type": "integer", "minimum": 0 },
+                "germination_rate": { "type": "number", "minimum": 0, "maximum": 1 }
+              }
+            }
+          }
+        }
+      },
+      "effects": [],
+      "preconditions": [],
+      "simulate": false,
+      "execution": "direct",
+      "idempotency": "optional",
+      "requires": { "tier": "anonymous", "mandate_scopes": ["content.read.search"] },
+      "pricing": { "per_call": "0", "settlement_on_commit": false },
+      "endpoint": "/ajar/actions/search_seed_catalog",
+      "transport": "ajar-http"
+    },
+    {
+      "id": "hold_seed_lot",
+      "title": "Reserve packets from a seed lot for 48 hours",
+      "risk": "R1",
+      "input_schema": {
+        "type": "object",
+        "required": ["lot_id", "packet_count"],
+        "properties": {
+          "lot_id": { "type": "string", "minLength": 1 },
+          "packet_count": { "type": "integer", "minimum": 1, "maximum": 10 }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": ["hold_id", "expires_at"],
+        "properties": {
+          "hold_id": { "type": "string" },
+          "expires_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "effects": [
+        { "type": "resource.create", "resource": "seed_lot_hold", "reversible_until": "P2D" }
+      ],
+      "preconditions": ["lot_packets_available"],
+      "simulate": true,
+      "execution": "direct",
+      "idempotency": "required",
+      "requires": { "tier": "signed", "mandate_scopes": ["commerce.hold.create"] },
+      "pricing": { "per_call": "0", "settlement_on_commit": false },
+      "endpoint": "/ajar/actions/hold_seed_lot",
+      "transport": "ajar-http"
+    },
+    {
+      "id": "purchase_seed_bundle",
+      "title": "Purchase a curated seed bundle",
+      "risk": "R3",
+      "input_schema": {
+        "type": "object",
+        "required": ["bundle_id", "shipping_address"],
+        "properties": {
+          "bundle_id": { "type": "string", "minLength": 1 },
+          "hold_id": { "type": "string" },
+          "shipping_address": {
+            "type": "object",
+            "required": ["name", "line1", "postcode", "country"],
+            "properties": {
+              "name": { "type": "string" },
+              "line1": { "type": "string" },
+              "line2": { "type": "string" },
+              "postcode": { "type": "string" },
+              "country": { "type": "string", "pattern": "^[A-Z]{2}$" }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": ["order_id", "total_charged", "dispatch_estimate"],
+        "properties": {
+          "order_id": { "type": "string" },
+          "total_charged": { "type": "string" },
+          "dispatch_estimate": { "type": "string", "format": "date" }
+        }
+      },
+      "effects": [
+        { "type": "financial.charge", "currency": "GBP", "max": "computed" },
+        { "type": "resource.create", "resource": "order", "reversible_until": "P14D" }
+      ],
+      "preconditions": ["bundle_in_stock", "ships_to_country"],
+      "simulate": true,
+      "execution": "two_phase",
+      "idempotency": "required",
+      "requires": { "tier": "verified", "mandate_scopes": ["commerce.purchase.goods"] },
+      "pricing": { "per_call": "0", "settlement_on_commit": true },
+      "endpoint": "/ajar/actions/purchase_seed_bundle",
+      "transport": "ajar-http"
+    },
+    {
+      "id": "update_germination_alerts",
+      "title": "Change germination-window alert subscriptions",
+      "risk": "R1",
+      "input_schema": {
+        "type": "object",
+        "required": ["subscriptions"],
+        "properties": {
+          "subscriptions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["species", "enabled"],
+              "properties": {
+                "species": { "type": "string" },
+                "enabled": { "type": "boolean" }
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": ["active_subscriptions"],
+        "properties": {
+          "active_subscriptions": { "type": "integer", "minimum": 0 }
+        }
+      },
+      "effects": [
+        { "type": "resource.update", "resource": "alert_subscription", "reversible_until": "P365D" }
+      ],
+      "preconditions": [],
+      "simulate": true,
+      "execution": "direct",
+      "idempotency": "required",
+      "requires": { "tier": "signed", "mandate_scopes": ["communication.subscription.modify"] },
+      "pricing": { "per_call": "0", "settlement_on_commit": false },
+      "endpoint": "/ajar/actions/update_germination_alerts",
+      "transport": "ajar-http"
+    }
+  ],
+  "policy_summary": {
+    "audience_tiers": ["anonymous", "signed", "verified"],
+    "rate_limits": {
+      "anonymous": "120/h",
+      "signed": "1200/h",
+      "verified": "6000/h"
+    },
+    "requires_mandate_from_risk": "R1"
+  },
+  "metering": {
+    "currency": "GBP",
+    "read": {
+      "anonymous": "0.0005/req",
+      "signed": "0",
+      "verified": "0"
+    },
+    "settlement": ["x402", "ap2-card"],
+    "endpoint_402": true
+  },
+  "issued_at": "2026-07-02T00:00:00Z",
+  "expires_at": "2026-09-30T00:00:00Z",
+  "sequence": 7,
+  "signature": {
+    "alg": "Ed25519",
+    "kid": "thistledown-owner-2026",
+    "sig": "oOhk9iTWU-XQ9iuQZbh8e5mOkDHNgZ7upPwIfmK_8qxP7wVw37HCuvZTF0KEUwD0kkIkBD55dm8kAoytJ7sNSA"
+  }
+}

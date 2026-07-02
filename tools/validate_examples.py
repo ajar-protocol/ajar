@@ -42,6 +42,8 @@ VALID_EXAMPLES = {
         "manifests/commerce-core-act-pay.json",
         "implementer-manifests/static-knowledge-base.json",
         "implementer-manifests/service-desk-act.json",
+        "implementer-manifests/mosskiln-reader-a.json",
+        "implementer-manifests/thistledown-reader-b.json",
     ],
     "view.schema.json": ["views/blog-home.view.json"],
     "policy.schema.json": ["policies/default-owner-policy.json"],

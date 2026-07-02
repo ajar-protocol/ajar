@@ -1,8 +1,7 @@
 # Phase 0 Review Report
 
 This report maps the planning Phase 0 tasks to the current `ajar` repo evidence.
-It is a readiness report for the initial v0.1 draft baseline, not a claim that
-the formal Phase 0 exit gate has closed.
+All Phase 0 exit gates are closed as of 2026-07-02.
 
 ## Summary
 
@@ -10,11 +9,26 @@ Local repository readiness is green. The spec repo contains the normative draft,
 schemas, examples, registries, seed vectors, local validation tooling, project
 templates, licenses, security policy, conduct policy, and contribution rules.
 
-Formal Phase 0 exit still requires one non-local proof:
+The independent reader exercise ([issue #2](https://github.com/ajar-protocol/ajar/issues/2))
+was completed on 2026-07-02, closing the last Phase 0 exit gate. Two
+independent AI agents (permitted by the ROADMAP exit criterion "two
+independent people (or agents)"), each given only `README.md`,
+`docs/03-PROTOCOL-SPEC.md`, `registries/scopes.md`, and
+`schemas/manifest.schema.json` — no examples — hand-wrote complete
+manifests. Both validate with zero schema errors and pass
+`tools/manifest_check.py`:
 
-- two independent readers must hand-write valid manifests from the spec alone,
-  and those manifests must validate
-  ([issue #2](https://github.com/ajar-protocol/ajar/issues/2))
+- Reader A (OpenAI Codex): `examples/implementer-manifests/mosskiln-reader-a.json`
+  (CORE+ACT+PAY, three actions)
+- Reader B (Anthropic Claude): `examples/implementer-manifests/thistledown-reader-b.json`
+  (CORE+ACT+PAY, four actions, R0-R3 range)
+
+Both readers also produced ambiguity notes; the actionable findings
+(operational-key certification bytes undefined, missing FED schema
+conditional, undefined idempotency and effect-type vocabularies, nested
+extension-field policy) are tracked in
+[issue #4](https://github.com/ajar-protocol/ajar/issues/4) for
+post-baseline refinement. **Phase 0 is exited.**
 
 Hosted validation is installed in `.github/workflows/validate.yml` and the
 first main-branch run passed for commit `6d94400`
@@ -64,20 +78,27 @@ before the affected surface is declared stable.
 | OQ-5 | Scope-registry governance | Use AEPs for v0.1 draft; define external registry governance before neutral transfer |
 | OQ-6 | Trust-list format, subscription, and verification semantics | Undefined in v0.1; defer `verified`-tier interop across Gateways |
 
-## Independent Reader Exercise
+## Independent Reader Exercise (completed 2026-07-02)
 
-The repo includes implementer-style manifest fixtures in
-`examples/implementer-manifests/`. They are useful preparation, but they do not
-replace the Phase 0 exit exercise.
+Protocol followed: each reader received only `README.md`,
+`docs/03-PROTOCOL-SPEC.md`, `registries/scopes.md`, and
+`schemas/manifest.schema.json` in an isolated directory, with no access to
+examples or other schemas, and hand-wrote a manifest for a fictional site of
+its own invention.
 
-To close the gate:
+- Reader A: OpenAI Codex (codex-cli 0.142.5) — `examples/implementer-manifests/mosskiln-reader-a.json`
+- Reader B: Anthropic Claude — `examples/implementer-manifests/thistledown-reader-b.json`
 
-1. Give two readers only `README.md`, `docs/03-PROTOCOL-SPEC.md`,
-   `registries/scopes.md`, and `schemas/manifest.schema.json`.
-2. Ask each reader to write a manifest without copying an existing example.
-3. Add the resulting manifests under `examples/implementer-manifests/` with
-   reviewer names or handles in the commit message or issue.
-4. Run `make validate` and record the result in this file.
+Recorded `make validate` result with both manifests included:
+
+```text
+Validated 14 valid examples, 8 invalid examples, 4 signing vectors, 2 HTTP signature vectors, 5 extension vectors, 6 manifest check vectors, 11 core vectors, 25 runtime vectors, and 12 scope vectors.
+MUST coverage OK: 24 requirements mapped.
+```
+
+Both manifests also pass `tools/manifest_check.py` individually. Reader
+ambiguity findings are tracked in
+[issue #4](https://github.com/ajar-protocol/ajar/issues/4).
 
 ## Hosted Validation
 
