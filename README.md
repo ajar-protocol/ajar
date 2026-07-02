@@ -31,6 +31,12 @@ python -m pip install jsonschema
 python tools/validate_examples.py
 ```
 
+Expected result:
+
+```text
+Validated 10 valid examples, 5 invalid examples, 4 signing vectors, and 10 core vectors.
+```
+
 CI runs the same validation for every push and pull request.
 
 The workflow template is in `ci/validate.yml`. Copy it to

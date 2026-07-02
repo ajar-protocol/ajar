@@ -7,11 +7,13 @@ Requires the `jsonschema` package. CI installs it before running this script.
 from __future__ import annotations
 
 import json
+import hashlib
 import sys
 import warnings
 from datetime import datetime
 from decimal import Decimal
 from pathlib import Path
+import re
 
 try:
     warnings.filterwarnings("ignore", category=DeprecationWarning)
@@ -24,6 +26,9 @@ except ModuleNotFoundError:
 ROOT = Path(__file__).resolve().parents[1]
 SCHEMAS = ROOT / "schemas"
 EXAMPLES = ROOT / "examples"
+TEST_VECTORS = ROOT / "test-vectors"
+
+from signing_profile import b64url, canonical_json_bytes, ed25519_verify, public_key, signing_payload, unb64url
 
 
 VALID_EXAMPLES = {
@@ -133,9 +138,92 @@ def validate_invalid_examples(store: dict[str, dict]) -> list[str]:
     return failures
 
 
+def validate_crypto_vectors() -> list[str]:
+    failures: list[str] = []
+    path = TEST_VECTORS / "crypto-signing.json"
+    vectors = load_json(path)
+
+    for vector in vectors["vectors"]:
+        artifact = load_json(ROOT / vector["artifact"])
+        payload = signing_payload(artifact, vector["artifact_type"])
+        canonical = canonical_json_bytes(payload)
+        seed = bytes.fromhex(vector["seed_hex"])
+        public = public_key(seed)
+        signature = unb64url(vector["signature_b64url"])
+
+        if canonical.decode("utf-8") != vector["canonical_utf8"]:
+            failures.append(f"{vector['id']} canonical bytes changed")
+        if hashlib.sha256(canonical).hexdigest() != vector["canonical_sha256"]:
+            failures.append(f"{vector['id']} canonical sha256 changed")
+        if b64url(public) != vector["public_key_b64url"]:
+            failures.append(f"{vector['id']} public key changed")
+        if not ed25519_verify(public, canonical, signature):
+            failures.append(f"{vector['id']} signature did not verify")
+
+    return failures
+
+
+def validate_core_vectors() -> list[str]:
+    failures: list[str] = []
+    vectors = load_json(TEST_VECTORS / "core-vectors.json")["vectors"]
+    invalid_cases = {case["error_code"] for case in load_json(EXAMPLES / "invalid" / "index.json")["cases"]}
+    error_registry = (ROOT / "registries" / "error-codes.md").read_text(encoding="utf-8")
+    seen_ids: set[str] = set()
+
+    for vector in vectors:
+        vector_id = vector["id"]
+        if vector_id in seen_ids:
+            failures.append(f"duplicate core vector id: {vector_id}")
+        seen_ids.add(vector_id)
+
+        input_path = (TEST_VECTORS / vector["input"]).resolve()
+        if not input_path.exists():
+            failures.append(f"{vector_id} input does not exist: {vector['input']}")
+
+        for context_path in vector.get("context", {}).values():
+            resolved = (TEST_VECTORS / context_path).resolve()
+            if not resolved.exists():
+                failures.append(f"{vector_id} context path does not exist: {context_path}")
+
+        verdict = vector["expected"].get("verdict")
+        if verdict not in {"accept", "reject"}:
+            failures.append(f"{vector_id} has invalid verdict: {verdict}")
+
+        error_code = vector["expected"].get("error_code")
+        if verdict == "reject":
+            if not error_code:
+                failures.append(f"{vector_id} reject vector is missing error_code")
+            elif error_code not in invalid_cases and error_code not in error_registry:
+                failures.append(f"{vector_id} references unknown error code: {error_code}")
+
+    return failures
+
+
+def validate_must_coverage() -> list[str]:
+    failures: list[str] = []
+    core_ids = {vector["id"] for vector in load_json(TEST_VECTORS / "core-vectors.json")["vectors"]}
+    text = (TEST_VECTORS / "must-coverage.md").read_text(encoding="utf-8")
+    for token in re.findall(r"`([^`]+)`", text):
+        if token.startswith("/") or token.endswith(".json"):
+            continue
+        if ":" in token or " " in token:
+            continue
+        if token.startswith("http") or token.startswith("Idempotency-Key"):
+            continue
+        if token not in core_ids:
+            failures.append(f"must-coverage.md references unknown vector id: {token}")
+    return failures
+
+
 def main() -> int:
     store = load_schemas()
-    failures = validate_valid_examples(store) + validate_invalid_examples(store)
+    failures = (
+        validate_valid_examples(store)
+        + validate_invalid_examples(store)
+        + validate_crypto_vectors()
+        + validate_core_vectors()
+        + validate_must_coverage()
+    )
     if failures:
         print("Ajar example validation failed:\n", file=sys.stderr)
         print("\n\n".join(failures), file=sys.stderr)
@@ -143,7 +231,12 @@ def main() -> int:
 
     valid_count = sum(len(paths) for paths in VALID_EXAMPLES.values())
     invalid_count = len(load_json(EXAMPLES / "invalid" / "index.json")["cases"])
-    print(f"Validated {valid_count} valid examples and {invalid_count} invalid examples.")
+    crypto_count = len(load_json(TEST_VECTORS / "crypto-signing.json")["vectors"])
+    core_count = len(load_json(TEST_VECTORS / "core-vectors.json")["vectors"])
+    print(
+        f"Validated {valid_count} valid examples, {invalid_count} invalid examples, "
+        f"{crypto_count} signing vectors, and {core_count} core vectors."
+    )
     return 0
 
 

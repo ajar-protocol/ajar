@@ -1,0 +1,46 @@
+{
+  "ajar_version": "0.1",
+  "canonicalization": "JCS/RFC8785-compatible JSON for the draft examples: UTF-8, sorted keys, no insignificant whitespace; remove the artifact's own signature field before signing.",
+  "vectors": [
+    {
+      "id": "manifest-commerce-signing",
+      "artifact_type": "manifest",
+      "artifact": "examples/manifests/commerce-core-act-pay.json",
+      "seed_hex": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+      "public_key_b64url": "A6EHv_POEL4dcN0Y50vAmWfk1jCbpQ1fHdyGZBJVMbg",
+      "canonical_utf8": "{\"actions\":[{\"effects\":[],\"endpoint\":\"/ajar/actions/search_routes\",\"execution\":\"direct\",\"id\":\"search_routes\",\"idempotency\":\"none\",\"input_schema\":{\"additionalProperties\":false,\"properties\":{\"date\":{\"format\":\"date\",\"type\":\"string\"},\"from\":{\"type\":\"string\"},\"to\":{\"type\":\"string\"}},\"required\":[\"from\",\"to\",\"date\"],\"type\":\"object\"},\"output_schema\":{\"properties\":{\"routes\":{\"type\":\"array\"}},\"required\":[\"routes\"],\"type\":\"object\"},\"pricing\":{\"per_call\":\"0\",\"settlement_on_commit\":false},\"requires\":{\"tier\":\"anonymous\"},\"risk\":\"R0\",\"simulate\":false,\"title\":\"Search train routes\",\"transport\":\"ajar-http\"},{\"effects\":[{\"currency\":\"INR\",\"max\":\"computed\",\"type\":\"financial.charge\"},{\"resource\":\"booking\",\"reversible_until\":\"P2D\",\"type\":\"resource.create\"}],\"endpoint\":\"/ajar/actions/purchase_tickets\",\"execution\":\"two_phase\",\"id\":\"purchase_tickets\",\"idempotency\":\"required\",\"input_schema\":{\"additionalProperties\":false,\"properties\":{\"passengers\":{\"maximum\":50,\"minimum\":1,\"type\":\"integer\"},\"route_id\":{\"type\":\"string\"},\"travel_class\":{\"enum\":[\"sleeper\",\"chair\",\"business\"],\"type\":\"string\"}},\"required\":[\"route_id\",\"passengers\",\"travel_class\"],\"type\":\"object\"},\"output_schema\":{\"properties\":{\"booking_id\":{\"type\":\"string\"},\"tickets\":{\"type\":\"integer\"}},\"required\":[\"booking_id\",\"tickets\"],\"type\":\"object\"},\"preconditions\":[\"seat_availability\"],\"pricing\":{\"per_call\":\"0\",\"settlement_on_commit\":true},\"requires\":{\"mandate_scopes\":[\"commerce.purchase.transport\"],\"tier\":\"verified\"},\"risk\":\"R3\",\"simulate\":true,\"title\":\"Purchase train tickets\",\"transport\":\"ajar-http\"}],\"ajar_version\":\"0.1\",\"expires_at\":\"2026-10-01T00:00:00Z\",\"issued_at\":\"2026-07-02T00:00:00Z\",\"keys\":{\"operational\":[{\"certification\":{\"alg\":\"Ed25519\",\"kid\":\"owner-2026\",\"sig\":\"certRailContentSigner001\"},\"key\":{\"crv\":\"Ed25519\",\"kid\":\"content-2026-07\",\"kty\":\"OKP\",\"x\":\"opsRailContentPublicKey001\"},\"scope\":[\"content-signing\"],\"valid_until\":\"2026-10-01T00:00:00Z\"},{\"certification\":{\"alg\":\"Ed25519\",\"kid\":\"owner-2026\",\"sig\":\"certRailOfferSigner001\"},\"key\":{\"crv\":\"Ed25519\",\"kid\":\"offer-2026-07\",\"kty\":\"OKP\",\"x\":\"opsRailOfferPublicKey001\"},\"scope\":[\"offer-signing\",\"receipt-signing\"],\"valid_until\":\"2026-10-01T00:00:00Z\"}],\"owner\":{\"crv\":\"Ed25519\",\"kid\":\"owner-2026\",\"kty\":\"OKP\",\"x\":\"ownerRailPublicKeyExample001\"}},\"metering\":{\"currency\":\"INR\",\"endpoint_402\":true,\"read\":{\"anonymous\":\"0\",\"signed\":\"0\"},\"settlement\":[\"x402\",\"ap2-card\",\"offline-invoice\"]},\"policy_summary\":{\"audience_tiers\":[\"anonymous\",\"signed\",\"verified\",\"contracted\"],\"rate_limits\":{\"anonymous\":\"60/h\",\"contracted\":\"12000/h\",\"signed\":\"600/h\",\"verified\":\"3000/h\"},\"requires_mandate_from_risk\":\"R2\"},\"profiles\":[\"CORE\",\"ACT\",\"PAY\"],\"sequence\":42,\"site\":{\"contact\":\"agents@examplerail.example\",\"description\":\"Intercity train ticketing with signed views and owner-approved actions.\",\"domain\":\"examplerail.example\",\"languages\":[\"en\",\"hi\"],\"legal_entity\":\"ExampleRail Pvt Ltd\",\"name\":\"ExampleRail\"},\"supported_versions\":[\"0.1\"],\"views\":{\"chunking\":{\"diff\":\"etag-per-chunk\",\"stable_ids\":true},\"index\":\"/ajar/views/index\",\"license\":{\"read\":\"allowed\",\"terms\":\"/ajar/license\",\"train\":\"denied\"},\"negotiation\":[\"application/ajar+json\",\"text/markdown\"]}}",
+      "canonical_sha256": "a4113771a95219691a22cc3ce6c00d7ec3992612c7fafc1b77793a34c3e4d14b",
+      "signature_b64url": "tgb0-mblveVnZ9SonOHvCmKPsaxzupkQ00l9wwod-VZjGSnDjqbi7UjcNUV6T0QoiyTx9msoBefgBig_YJXWDg"
+    },
+    {
+      "id": "mandate-ticket-signing",
+      "artifact_type": "mandate",
+      "artifact": "examples/scenario-tickets/mandate.json",
+      "seed_hex": "202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f",
+      "public_key_b64url": "Kay64UG8yvCyLhqU000LxzYeUm0L_hLIl5S8kyKWbdc",
+      "canonical_utf8": "{\"ajar_version\":\"0.1\",\"caps\":{\"count\":1,\"per_tx\":{\"INR\":200000},\"total\":{\"INR\":200000}},\"constraints\":{\"domains_allow\":[\"*.examplerail.example\"],\"forbidden\":[\"commerce.cancel.*\"],\"risk_max\":\"R3\"},\"delegation\":{\"chain\":[],\"sub_delegation\":false},\"id\":\"urn:uuid:11111111-1111-4111-8111-111111111111\",\"issuer\":{\"key\":{\"crv\":\"Ed25519\",\"kid\":\"principal-2026\",\"kty\":\"OKP\",\"x\":\"principalBuyerPublicKey001\"},\"kind\":\"principal\"},\"revocation\":{\"cached_ttl\":\"PT10M\",\"endpoint\":\"https://principal.example/ajar/revocations\"},\"scopes\":[\"commerce.purchase.transport\",\"content.read.*\"],\"subject\":{\"key\":{\"crv\":\"Ed25519\",\"kid\":\"agent-2026\",\"kty\":\"OKP\",\"x\":\"agentOperatorPublicKey001\"},\"kind\":\"agent\",\"operator\":\"https://agent.example\"},\"type\":\"mandate\",\"valid_from\":\"2026-07-01T00:00:00Z\",\"valid_until\":\"2026-07-31T23:59:59Z\"}",
+      "canonical_sha256": "634318bedbc8b2ed937a7e325609f207205a84c31784aea1fa1804d7461c640d",
+      "signature_b64url": "4eSNnu6N0JC9MsKQRweacAW1a0EqB0-X21Xp08j5w28779FUXdypo8B9dDsgBTH-HcVltMg6eA5jUHS16U7oBg"
+    },
+    {
+      "id": "offer-ticket-signing",
+      "artifact_type": "offer",
+      "artifact": "examples/scenario-tickets/offer.json",
+      "seed_hex": "404142434445464748494a4b4c4d4e4f505152535455565758595a5b5c5d5e5f",
+      "public_key_b64url": "JUO5L_EJVRFHatyDadtt3JM2ZaEZeN2hQE7hBmypVZ0",
+      "canonical_utf8": "{\"action_id\":\"purchase_tickets\",\"ajar_version\":\"0.1\",\"expires_at\":\"2026-07-20T10:10:00Z\",\"input_hash\":\"sha256:ticketInputHash001\",\"issued_at\":\"2026-07-20T10:00:00Z\",\"offer_id\":\"urn:uuid:22222222-2222-4222-8222-222222222222\",\"resolved_effects\":[{\"amount\":\"175000\",\"currency\":\"INR\",\"type\":\"financial.charge\"},{\"resource\":\"booking\",\"reversible_until\":\"P2D\",\"type\":\"resource.create\"}],\"single_use\":true,\"total_cost\":{\"amount\":\"175000\",\"currency\":\"INR\"},\"type\":\"offer\"}",
+      "canonical_sha256": "21283880cad159b5cde9194d6206e0625b7ca938ee30ef95128d695c554d149f",
+      "signature_b64url": "JxqIuUE8oAKHT44Kh8500yq9Jn2IFhzifut29kCSRmrY8k8hYIOQUHHRpT-wfuRyYoDKXDRpSQkAcA1vaTXGCw"
+    },
+    {
+      "id": "receipt-ticket-signing",
+      "artifact_type": "receipt",
+      "artifact": "examples/scenario-tickets/receipt.json",
+      "seed_hex": "606162636465666768696a6b6c6d6e6f707172737475767778797a7b7c7d7e7f",
+      "public_key_b64url": "F0VTtFbd38aQjsqxwQH-arIeK6oGF3lbfUOmNIKZP9U",
+      "canonical_utf8": "{\"ajar_version\":\"0.1\",\"executed_at\":\"2026-07-20T10:03:00Z\",\"mandate_hash\":\"sha256:mandateTicketHash001\",\"offer\":{\"action_id\":\"purchase_tickets\",\"ajar_version\":\"0.1\",\"expires_at\":\"2026-07-20T10:10:00Z\",\"input_hash\":\"sha256:ticketInputHash001\",\"issued_at\":\"2026-07-20T10:00:00Z\",\"offer_id\":\"urn:uuid:22222222-2222-4222-8222-222222222222\",\"resolved_effects\":[{\"amount\":\"175000\",\"currency\":\"INR\",\"type\":\"financial.charge\"},{\"resource\":\"booking\",\"reversible_until\":\"P2D\",\"type\":\"resource.create\"}],\"signature\":{\"alg\":\"Ed25519\",\"kid\":\"offer-2026-07\",\"sig\":\"offerTicketScenarioSignature001\"},\"single_use\":true,\"total_cost\":{\"amount\":\"175000\",\"currency\":\"INR\"},\"type\":\"offer\"},\"receipt_id\":\"urn:uuid:33333333-3333-4333-8333-333333333333\",\"result_summary\":{\"message\":\"50 tickets purchased for route NDLS-BCT-2026-07-20-12952.\",\"resource_ids\":[\"booking-ER-20260720-0001\"],\"status\":\"succeeded\"},\"type\":\"receipt\"}",
+      "canonical_sha256": "14af625a44649d9a971c5c661e87e751f9e286f3a03d8e2362bcf44733f55a07",
+      "signature_b64url": "YBXDgS0xD4BLuC2GGZ1PcfxjVpLLuwhjeXJWW61tbLk8EmsdmMgyrtn4r5wra-Mj7nnvKSxDtfcMVdbmHAsvCA"
+    }
+  ]
+}

@@ -15,6 +15,6 @@ Contents:
 - `scenario-tickets/` — mandate, simulation, offer, and receipt for the canonical 50-ticket purchase
 - `invalid/` — deliberately broken artifacts with expected `Ajar-Error-Code`
 
-The signature values are deterministic placeholders for schema and semantic
-validation. Cryptographic signing vectors are tracked separately from these
-shape examples.
+Most example signatures are deterministic stand-ins for schema and semantic
+validation. Reproducible cryptographic vectors for Manifest, Mandate, Offer,
+and Receipt signing live in `../test-vectors/crypto-signing.json`.

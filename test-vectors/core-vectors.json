@@ -43,6 +43,16 @@
       }
     },
     {
+      "id": "action-risk-floor-lowered",
+      "profile": "ACT",
+      "spec_section": "5.1",
+      "input": "../examples/invalid/risk-floor/manifest.json",
+      "expected": {
+        "verdict": "reject",
+        "error_code": "AJAR-ACTION-RISK-FLOOR"
+      }
+    },
+    {
       "id": "offer-valid",
       "profile": "ACT",
       "spec_section": "7",

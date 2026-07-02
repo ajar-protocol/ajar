@@ -36,6 +36,14 @@
       "last_seen_sequence": 42,
       "error_code": "AJAR-VERIFY-ROLLBACK",
       "why": "Current manifest sequence 41 is lower than the last accepted sequence 42."
+    },
+    {
+      "id": "risk-floor-lowered",
+      "path": "risk-floor/manifest.json",
+      "schema": "manifest.schema.json",
+      "expected": "schema-fail",
+      "error_code": "AJAR-ACTION-RISK-FLOOR",
+      "why": "An R3 action attempts direct execution without required SIMULATE, two-phase execution, and idempotency."
     }
   ]
 }

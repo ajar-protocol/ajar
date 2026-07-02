@@ -42,6 +42,8 @@ Durable Ajar artifacts are signed as canonical JSON:
 
 Embedded signatures are part of the transmitted artifact but never part of the bytes signed by that same signature. Nested signed objects, such as an Offer embedded in a Receipt, retain their own signatures as data when the parent object is canonicalized.
 
+Worked Manifest, Mandate, Offer, and Receipt signing vectors live in `test-vectors/crypto-signing.json`. `tools/signing_profile.py` reproduces the canonical bytes, SHA-256 digest, public key, signature, and verification result from only the Python standard library.
+
 ## 3. The Capability Manifest
 
 ```jsonc
