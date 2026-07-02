@@ -2,7 +2,7 @@
 
 Executable seed conformance-vector data for the v0.1 draft.
 
-These files document expected verdicts and spec clauses. `tools/validate_examples.py`
+These files document expected verdicts and spec clauses. `make validate`
 executes the static and runtime vectors that can be checked inside this repo.
 The future `conformance` repo can reuse the same vector ids and expected
 verdicts when it adds implementation-facing network tests.

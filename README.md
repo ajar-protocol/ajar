@@ -27,8 +27,8 @@ Implementer: spec → schemas → examples → conformance suite. Newcomer: [`pl
 ## Validation
 
 ```bash
-python -m pip install jsonschema
-python tools/validate_examples.py
+python3 -m pip install -r requirements-dev.txt
+make validate
 ```
 
 Expected result:
@@ -37,7 +37,8 @@ Expected result:
 Validated 10 valid examples, 5 invalid examples, 4 signing vectors, 2 HTTP signature vectors, 5 extension vectors, 10 core vectors, 8 runtime vectors, and 10 scope vectors.
 ```
 
-CI runs the same validation for every push and pull request.
+`make validate` runs schema/example/vector validation, local Markdown link
+checks, and Markdown hygiene checks.
 
 The workflow template is in `ci/validate.yml`. Copy it to
 `.github/workflows/validate.yml` once the publishing account has workflow
