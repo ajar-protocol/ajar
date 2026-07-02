@@ -12,6 +12,8 @@ This file records the local evidence for the v0.1 draft specification baseline.
 - Examples: `examples/`
 - Implementer-style manifest fixtures: `examples/implementer-manifests/`
 - Executable seed vectors: `test-vectors/`
+- Phase 0 task review: `PHASE-0-REVIEW.md`
+- Contribution rules: `CONTRIBUTING.md`
 - Local validation: `make validate`
 - Phase 0 readiness: `python3 tools/check_phase0.py`
 

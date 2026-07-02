@@ -62,6 +62,8 @@ def check_required_files(failures: list[str]) -> None:
         "examples/scenario-tickets/receipt.json",
         "examples/invalid/index.json",
         "test-vectors/must-coverage.md",
+        "PHASE-0-REVIEW.md",
+        "CONTRIBUTING.md",
         "ci/validate.yml",
         "SECURITY.md",
         "CODE_OF_CONDUCT.md",

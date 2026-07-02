@@ -20,6 +20,8 @@ Ajar is an owner-controlled semantic layer over HTTPS. It defines a signed Capab
 | `registries/` | Scope registry, error codes, settlement adapters |
 | `test-vectors/` | Seed conformance-vector data and MUST coverage |
 | `PHASE-0-BASELINE.md` | Local readiness evidence for the v0.1 draft baseline |
+| `PHASE-0-REVIEW.md` | Phase 0 task-to-evidence review and remaining exit gates |
+| `CONTRIBUTING.md` | Contribution rules, validation commands, and review invariants |
 | `AEPs/` | Ajar Enhancement Proposals |
 
 ## Reading order
@@ -49,6 +51,8 @@ permission enabled.
 
 ## Changing the protocol
 Use AEPs; see `AEPs/README.md`. Anyone may propose changes, including independent implementers. Editorial fixes go by normal PR. Anything touching a MUST goes through an AEP.
+
+See `CONTRIBUTING.md` before opening a pull request.
 
 ## Machine consumption
 This repo is also structured for automated consumption: stable heading IDs, one concept per section, and individually citable MUSTs. It is the source material for the planned `ajar-docs-mcp` server and for the Ajar views served by ajarprotocol.org.
