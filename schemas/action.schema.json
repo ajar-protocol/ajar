@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spec.ajarprotocol.org/schemas/action.schema.json",
+  "title": "Ajar Action",
+  "$comment": "docs/03-PROTOCOL-SPEC.md section 5.",
+  "type": "object",
+  "required": [
+    "id",
+    "title",
+    "risk",
+    "input_schema",
+    "output_schema",
+    "effects",
+    "simulate",
+    "execution",
+    "idempotency",
+    "requires",
+    "endpoint",
+    "transport"
+  ],
+  "properties": {
+    "id": { "type": "string", "pattern": "^[a-z][a-z0-9_:-]{2,80}$" },
+    "title": { "type": "string", "minLength": 1 },
+    "risk": { "$ref": "common.schema.json#/$defs/risk" },
+    "input_schema": { "type": "object" },
+    "output_schema": { "type": "object" },
+    "effects": {
+      "type": "array",
+      "items": { "$ref": "common.schema.json#/$defs/effect" }
+    },
+    "preconditions": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "simulate": { "type": "boolean" },
+    "execution": { "type": "string", "enum": ["direct", "two_phase"] },
+    "idempotency": { "type": "string", "enum": ["none", "optional", "required"] },
+    "requires": {
+      "type": "object",
+      "required": ["tier"],
+      "properties": {
+        "tier": { "type": "string", "enum": ["anonymous", "signed", "verified", "allowlist", "contracted"] },
+        "mandate_scopes": {
+          "type": "array",
+          "items": { "$ref": "common.schema.json#/$defs/scope" }
+        }
+      },
+      "additionalProperties": false
+    },
+    "pricing": {
+      "type": "object",
+      "properties": {
+        "per_call": { "type": "string" },
+        "settlement_on_commit": { "type": "boolean" }
+      },
+      "additionalProperties": true
+    },
+    "endpoint": { "$ref": "common.schema.json#/$defs/uri_reference" },
+    "transport": { "type": "string", "enum": ["ajar-http", "mcp", "webmcp"] }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "risk": { "enum": ["R1", "R2", "R3"] } }, "required": ["risk"] },
+      "then": { "properties": { "simulate": { "const": true }, "idempotency": { "const": "required" } } }
+    },
+    {
+      "if": { "properties": { "risk": { "enum": ["R2", "R3"] } }, "required": ["risk"] },
+      "then": { "properties": { "execution": { "const": "two_phase" } } }
+    }
+  ],
+  "additionalProperties": false
+}

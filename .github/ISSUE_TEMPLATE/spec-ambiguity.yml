@@ -1,0 +1,28 @@
+name: Spec ambiguity
+description: Report an ambiguity, contradiction, or missing requirement in the protocol text.
+title: "[spec] "
+labels: ["spec", "triage"]
+body:
+  - type: input
+    id: task
+    attributes:
+      label: Planning task
+      description: Link this to a Phase 0 task when possible.
+      placeholder: "T0.1"
+  - type: textarea
+    id: issue
+    attributes:
+      label: Issue
+      description: Describe the ambiguity or contradiction.
+    validations:
+      required: true
+  - type: textarea
+    id: proposed-resolution
+    attributes:
+      label: Proposed resolution
+      description: Suggest exact spec, schema, registry, or example changes.
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      description: Reference spec sections, examples, or external standards.

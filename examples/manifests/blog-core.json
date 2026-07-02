@@ -1,0 +1,66 @@
+{
+  "ajar_version": "0.1",
+  "supported_versions": ["0.1"],
+  "profiles": ["CORE"],
+  "site": {
+    "name": "Example Notes",
+    "domain": "notes.example",
+    "description": "Independent publication with signed semantic article views.",
+    "languages": ["en"],
+    "contact": "agents@notes.example"
+  },
+  "keys": {
+    "owner": {
+      "kty": "OKP",
+      "crv": "Ed25519",
+      "x": "ownerNotesPublicKeyExample001",
+      "kid": "owner-2026"
+    },
+    "operational": [
+      {
+        "key": {
+          "kty": "OKP",
+          "crv": "Ed25519",
+          "x": "opsNotesPublicKeyExample001",
+          "kid": "content-2026-07"
+        },
+        "scope": ["content-signing"],
+        "valid_until": "2026-10-01T00:00:00Z",
+        "certification": {
+          "alg": "Ed25519",
+          "kid": "owner-2026",
+          "sig": "certNotesContentSigner001"
+        }
+      }
+    ]
+  },
+  "views": {
+    "negotiation": ["application/ajar+json", "text/markdown"],
+    "index": "/ajar/views/index",
+    "chunking": {
+      "stable_ids": true,
+      "diff": "etag-per-chunk"
+    },
+    "license": {
+      "read": "allowed",
+      "train": "denied",
+      "terms": "/ajar/license"
+    }
+  },
+  "policy_summary": {
+    "audience_tiers": ["anonymous", "signed"],
+    "rate_limits": {
+      "anonymous": "120/h",
+      "signed": "1200/h"
+    },
+    "requires_mandate_from_risk": "R2"
+  },
+  "issued_at": "2026-07-02T00:00:00Z",
+  "expires_at": "2026-10-01T00:00:00Z",
+  "sequence": 1,
+  "signature": {
+    "alg": "Ed25519",
+    "kid": "owner-2026",
+    "sig": "manifestNotesSignature001"
+  }
+}

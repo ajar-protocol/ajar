@@ -1,0 +1,53 @@
+{
+  "ajar_version": "0.1",
+  "type": "receipt",
+  "receipt_id": "urn:uuid:33333333-3333-4333-8333-333333333333",
+  "offer": {
+    "ajar_version": "0.1",
+    "type": "offer",
+    "offer_id": "urn:uuid:22222222-2222-4222-8222-222222222222",
+    "action_id": "purchase_tickets",
+    "input_hash": "sha256:ticketInputHash001",
+    "resolved_effects": [
+      {
+        "type": "financial.charge",
+        "currency": "INR",
+        "amount": "175000"
+      },
+      {
+        "type": "resource.create",
+        "resource": "booking",
+        "reversible_until": "P2D"
+      }
+    ],
+    "total_cost": {
+      "currency": "INR",
+      "amount": "175000"
+    },
+    "issued_at": "2026-07-20T10:00:00Z",
+    "expires_at": "2026-07-20T10:10:00Z",
+    "single_use": true,
+    "signature": {
+      "alg": "Ed25519",
+      "kid": "offer-2026-07",
+      "sig": "offerTicketScenarioSignature001"
+    }
+  },
+  "mandate_hash": "sha256:mandateTicketHash001",
+  "result_summary": {
+    "status": "succeeded",
+    "resource_ids": ["booking-ER-20260720-0001"],
+    "message": "50 tickets purchased for route NDLS-BCT-2026-07-20-12952."
+  },
+  "executed_at": "2026-07-20T10:03:00Z",
+  "site_signature": {
+    "alg": "Ed25519",
+    "kid": "offer-2026-07",
+    "sig": "receiptSiteTicketSignature001"
+  },
+  "agent_signature": {
+    "alg": "Ed25519",
+    "kid": "agent-2026",
+    "sig": "receiptAgentTicketSignature001"
+  }
+}

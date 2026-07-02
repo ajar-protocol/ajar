@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spec.ajarprotocol.org/schemas/mandate.schema.json",
+  "title": "Ajar Mandate",
+  "$comment": "docs/03-PROTOCOL-SPEC.md section 8.1.",
+  "type": "object",
+  "required": [
+    "ajar_version",
+    "type",
+    "id",
+    "issuer",
+    "subject",
+    "scopes",
+    "caps",
+    "constraints",
+    "valid_from",
+    "valid_until",
+    "revocation",
+    "signature"
+  ],
+  "properties": {
+    "ajar_version": { "$ref": "common.schema.json#/$defs/ajar_version" },
+    "type": { "const": "mandate" },
+    "id": { "type": "string", "pattern": "^urn:uuid:[0-9a-fA-F-]{36}$" },
+    "issuer": {
+      "type": "object",
+      "required": ["kind", "key"],
+      "properties": {
+        "kind": { "const": "principal" },
+        "key": { "$ref": "common.schema.json#/$defs/jwk_ed25519" }
+      },
+      "additionalProperties": false
+    },
+    "subject": {
+      "type": "object",
+      "required": ["kind", "operator", "key"],
+      "properties": {
+        "kind": { "const": "agent" },
+        "operator": { "$ref": "common.schema.json#/$defs/https_uri" },
+        "key": { "$ref": "common.schema.json#/$defs/jwk_ed25519" }
+      },
+      "additionalProperties": false
+    },
+    "scopes": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "common.schema.json#/$defs/scope" }
+    },
+    "caps": {
+      "type": "object",
+      "properties": {
+        "per_tx": { "type": "object", "additionalProperties": { "type": "number", "minimum": 0 } },
+        "total": { "type": "object", "additionalProperties": { "type": "number", "minimum": 0 } },
+        "count": { "type": "integer", "minimum": 1 },
+        "per_period": { "type": "object", "additionalProperties": true }
+      },
+      "additionalProperties": false
+    },
+    "constraints": {
+      "type": "object",
+      "required": ["domains_allow", "risk_max"],
+      "properties": {
+        "domains_allow": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "risk_max": { "$ref": "common.schema.json#/$defs/risk" },
+        "forbidden": {
+          "type": "array",
+          "items": { "$ref": "common.schema.json#/$defs/scope" }
+        }
+      },
+      "additionalProperties": false
+    },
+    "valid_from": { "$ref": "common.schema.json#/$defs/date_time" },
+    "valid_until": { "$ref": "common.schema.json#/$defs/date_time" },
+    "delegation": {
+      "type": "object",
+      "properties": {
+        "chain": { "type": "array", "items": { "type": "string" } },
+        "sub_delegation": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    },
+    "revocation": {
+      "type": "object",
+      "required": ["endpoint", "cached_ttl"],
+      "properties": {
+        "endpoint": { "$ref": "common.schema.json#/$defs/https_uri" },
+        "cached_ttl": { "type": "string", "pattern": "^P(T.*|[0-9].*)$" }
+      },
+      "additionalProperties": false
+    },
+    "signature": { "$ref": "common.schema.json#/$defs/signature" }
+  },
+  "additionalProperties": false
+}

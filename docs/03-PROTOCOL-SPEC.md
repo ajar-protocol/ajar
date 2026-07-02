@@ -1,6 +1,6 @@
 # 03 — The Ajar Protocol — Draft Specification v0.1
 
-*Status: DRAFT for implementation feedback. Normative keywords (MUST/SHOULD/MAY) per RFC 2119. This spec defines **semantics over HTTPS** — no new wire protocol. All JSON examples are illustrative; extracted JSON Schemas will live in `/schemas` once frozen (Phase 0, task T0.4).*
+*Status: DRAFT for implementation feedback. Normative keywords (MUST/SHOULD/MAY) per RFC 2119. This spec defines **semantics over HTTPS** — no new wire protocol. JSON Schemas live in `/schemas`, golden examples in `/examples`, registries in `/registries`, and seed conformance vectors in `/test-vectors`.*
 
 ---
 
@@ -29,6 +29,18 @@ Sites MAY advertise it in HTML (`<link rel="ajar-manifest">`) and via HTTP heade
 
 ### 2.3 Agent identity
 Agents MUST sign requests with HTTP Message Signatures (RFC 9421, `tag="ajar"`), interoperable with Web Bot Auth: `Signature-Agent` points to the operator's key directory (`/.well-known/http-message-signatures-directory`). Anonymous access is at the owner's policy discretion (tier `anonymous`).
+
+### 2.4 Canonicalization and signatures
+
+Durable Ajar artifacts are signed as canonical JSON:
+
+1. Remove the artifact's signature field before signing: `signature` for Manifest, Mandate, and Offer; `site_signature` and `agent_signature` for Receipt.
+2. Serialize the remaining JSON with JCS (RFC 8785), UTF-8, no insignificant whitespace, and lexicographically sorted object keys.
+3. Sign the exact canonical bytes with Ed25519.
+4. Encode public keys and signatures as base64url without padding.
+5. Store the signer key id in `kid`. Verifiers MUST resolve `kid` from the relevant owner, operational, principal, or agent key directory before accepting the signature.
+
+Embedded signatures are part of the transmitted artifact but never part of the bytes signed by that same signature. Nested signed objects, such as an Offer embedded in a Receipt, retain their own signatures as data when the parent object is canonicalized.
 
 ## 3. The Capability Manifest
 
@@ -166,7 +178,7 @@ For `execution: two_phase`:
   "signature": { "...": "principal signature over JCS(mandate)" }
 }
 ```
-- Scope names use a dotted registry (Phase 0 defines the core registry: `content.*`, `commerce.*`, `communication.*`, `account.*`, `data.*`).
+- Scope names use the dotted registry in `registries/scopes.md`. A mandate scope covers an action requirement by exact match or suffix wildcard match (`commerce.purchase.*` covers `commerce.purchase.transport`). Entries in `constraints.forbidden` override allowed scopes.
 - **Standing mandates** (org↔org, e.g., recurring invoices) are ordinary mandates with recurrence constraints (`caps.per_period`) and long validity — the machinery is identical.
 - Sites MUST verify: signature, validity window, scope ⊇ action requirement, caps ≥ resolved cost, revocation check (best effort within `cached_ttl`).
 
@@ -197,14 +209,14 @@ Clients MAY interact with non-Ajar sites via rendering/extraction, but MUST: hon
 | Idempotency | `Idempotency-Key: <uuid>` (R1+ MUST) |
 | Metering | `402` + `Ajar-Price` / settlement-adapter headers (x402-compatible) |
 | Signatures | RFC 9421 `Signature`/`Signature-Input` (`tag="ajar"`), `Ajar-Content-Signature` on views |
-| Errors | RFC 9457 problem+json with `Ajar-Error-Code` registry (Phase 0 task T0.6) |
+| Errors | RFC 9457 problem+json with the `Ajar-Error-Code` registry in `registries/error-codes.md` |
 
 ## 11. Conformance
 
 - **Gateway/CORE:** valid signed manifest; negotiated signed views; chunk diff.
 - **Gateway/ACT:** risk classes enforced per §5.1 table; SIMULATE fidelity; two-phase integrity; mandate verification; receipts.
 - **Client:** verification pipeline (§3); simulate-before-commit; deterministic mandate enforcement; receipt retention; fallback rules (§9).
-- A conformance test suite is a Phase-0/1 deliverable (task T0.7 / T1.10) — implementations claim compliance only against it.
+- Seed data vectors live in `/test-vectors`; the executable harness belongs in the future `conformance` repo. Implementations claim compatibility only against the public conformance suite once that harness exists.
 
 ## 12. Open questions (tracked in DECISIONS.md)
 
@@ -213,3 +225,16 @@ Clients MAY interact with non-Ajar sites via rendering/extraction, but MUST: hon
 - OQ-3: SIMULATE for actions with inherently uncertain outcomes (auctions, inventory races) — probabilistic effect syntax?
 - OQ-4: privacy-preserving discovery (query patterns leak intent to Index nodes; OPRF/PSI options).
 - OQ-5: scope-registry governance once external parties adopt.
+
+## 13. Version and extension policy
+
+- `ajar_version` uses semantic versioning. `0.1` is the first implementation draft.
+- Compatible additions MAY add optional fields, registry entries, examples, or non-required schema properties.
+- Breaking changes MUST bump the major version and include a migration note.
+- Unknown fields MUST be ignored unless they appear in an object position where the schema has `additionalProperties: false`.
+- Private extensions MUST use `x-<vendor>-` prefixes for fields, scopes, adapters, and non-standard transports.
+- Public extensions that affect interoperability MUST go through the AEP process.
+
+Compatible example: adding optional `federation.monitors[]` to a FED manifest while old clients continue to verify signatures and use `federation.logs`.
+
+Breaking example: changing Offer `total_cost.amount` from a decimal string to a number would require a major version bump and a migration note because it changes canonical bytes and validation behavior.

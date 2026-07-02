@@ -1,0 +1,8 @@
+{
+  "type": "https://spec.ajarprotocol.org/problems/mandate-cap",
+  "title": "Mandate cap exceeded",
+  "status": 403,
+  "detail": "Offer total INR 250000 exceeds mandate per_tx cap INR 100000.",
+  "ajar_error_code": "AJAR-MANDATE-CAP",
+  "spec_section": "8.1"
+}

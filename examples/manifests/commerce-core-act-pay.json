@@ -1,0 +1,179 @@
+{
+  "ajar_version": "0.1",
+  "supported_versions": ["0.1"],
+  "profiles": ["CORE", "ACT", "PAY"],
+  "site": {
+    "name": "ExampleRail",
+    "domain": "examplerail.example",
+    "description": "Intercity train ticketing with signed views and owner-approved actions.",
+    "languages": ["en", "hi"],
+    "legal_entity": "ExampleRail Pvt Ltd",
+    "contact": "agents@examplerail.example"
+  },
+  "keys": {
+    "owner": {
+      "kty": "OKP",
+      "crv": "Ed25519",
+      "x": "ownerRailPublicKeyExample001",
+      "kid": "owner-2026"
+    },
+    "operational": [
+      {
+        "key": {
+          "kty": "OKP",
+          "crv": "Ed25519",
+          "x": "opsRailContentPublicKey001",
+          "kid": "content-2026-07"
+        },
+        "scope": ["content-signing"],
+        "valid_until": "2026-10-01T00:00:00Z",
+        "certification": {
+          "alg": "Ed25519",
+          "kid": "owner-2026",
+          "sig": "certRailContentSigner001"
+        }
+      },
+      {
+        "key": {
+          "kty": "OKP",
+          "crv": "Ed25519",
+          "x": "opsRailOfferPublicKey001",
+          "kid": "offer-2026-07"
+        },
+        "scope": ["offer-signing", "receipt-signing"],
+        "valid_until": "2026-10-01T00:00:00Z",
+        "certification": {
+          "alg": "Ed25519",
+          "kid": "owner-2026",
+          "sig": "certRailOfferSigner001"
+        }
+      }
+    ]
+  },
+  "views": {
+    "negotiation": ["application/ajar+json", "text/markdown"],
+    "index": "/ajar/views/index",
+    "chunking": {
+      "stable_ids": true,
+      "diff": "etag-per-chunk"
+    },
+    "license": {
+      "read": "allowed",
+      "train": "denied",
+      "terms": "/ajar/license"
+    }
+  },
+  "actions": [
+    {
+      "id": "search_routes",
+      "title": "Search train routes",
+      "risk": "R0",
+      "input_schema": {
+        "type": "object",
+        "required": ["from", "to", "date"],
+        "properties": {
+          "from": { "type": "string" },
+          "to": { "type": "string" },
+          "date": { "type": "string", "format": "date" }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": ["routes"],
+        "properties": {
+          "routes": { "type": "array" }
+        }
+      },
+      "effects": [],
+      "simulate": false,
+      "execution": "direct",
+      "idempotency": "none",
+      "requires": {
+        "tier": "anonymous"
+      },
+      "pricing": {
+        "per_call": "0",
+        "settlement_on_commit": false
+      },
+      "endpoint": "/ajar/actions/search_routes",
+      "transport": "ajar-http"
+    },
+    {
+      "id": "purchase_tickets",
+      "title": "Purchase train tickets",
+      "risk": "R3",
+      "input_schema": {
+        "type": "object",
+        "required": ["route_id", "passengers", "travel_class"],
+        "properties": {
+          "route_id": { "type": "string" },
+          "passengers": { "type": "integer", "minimum": 1, "maximum": 50 },
+          "travel_class": { "type": "string", "enum": ["sleeper", "chair", "business"] }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": ["booking_id", "tickets"],
+        "properties": {
+          "booking_id": { "type": "string" },
+          "tickets": { "type": "integer" }
+        }
+      },
+      "effects": [
+        {
+          "type": "financial.charge",
+          "currency": "INR",
+          "max": "computed"
+        },
+        {
+          "type": "resource.create",
+          "resource": "booking",
+          "reversible_until": "P2D"
+        }
+      ],
+      "preconditions": ["seat_availability"],
+      "simulate": true,
+      "execution": "two_phase",
+      "idempotency": "required",
+      "requires": {
+        "tier": "verified",
+        "mandate_scopes": ["commerce.purchase.transport"]
+      },
+      "pricing": {
+        "per_call": "0",
+        "settlement_on_commit": true
+      },
+      "endpoint": "/ajar/actions/purchase_tickets",
+      "transport": "ajar-http"
+    }
+  ],
+  "policy_summary": {
+    "audience_tiers": ["anonymous", "signed", "verified", "contracted"],
+    "rate_limits": {
+      "anonymous": "60/h",
+      "signed": "600/h",
+      "verified": "3000/h",
+      "contracted": "12000/h"
+    },
+    "requires_mandate_from_risk": "R2"
+  },
+  "metering": {
+    "currency": "INR",
+    "read": {
+      "anonymous": "0",
+      "signed": "0"
+    },
+    "settlement": ["x402", "ap2-card", "offline-invoice"],
+    "endpoint_402": true
+  },
+  "issued_at": "2026-07-02T00:00:00Z",
+  "expires_at": "2026-10-01T00:00:00Z",
+  "sequence": 42,
+  "signature": {
+    "alg": "Ed25519",
+    "kid": "owner-2026",
+    "sig": "manifestRailSignature001"
+  }
+}

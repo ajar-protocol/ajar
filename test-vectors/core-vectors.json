@@ -1,0 +1,96 @@
+{
+  "ajar_version": "0.1",
+  "vectors": [
+    {
+      "id": "manifest-core-valid",
+      "profile": "CORE",
+      "spec_section": "3",
+      "input": "../examples/manifests/blog-core.json",
+      "expected": {
+        "verdict": "accept"
+      }
+    },
+    {
+      "id": "manifest-act-pay-valid",
+      "profile": "ACT",
+      "spec_section": "3",
+      "input": "../examples/manifests/commerce-core-act-pay.json",
+      "expected": {
+        "verdict": "accept"
+      }
+    },
+    {
+      "id": "manifest-bad-signature-shape",
+      "profile": "CORE",
+      "spec_section": "2.4",
+      "input": "../examples/invalid/bad-signature/manifest.json",
+      "expected": {
+        "verdict": "reject",
+        "error_code": "AJAR-VERIFY-BAD-SIGNATURE"
+      }
+    },
+    {
+      "id": "manifest-sequence-rollback",
+      "profile": "CORE",
+      "spec_section": "3",
+      "input": "../examples/invalid/sequence-rollback/current-manifest.json",
+      "state": {
+        "last_seen_sequence": 42
+      },
+      "expected": {
+        "verdict": "reject",
+        "error_code": "AJAR-VERIFY-ROLLBACK"
+      }
+    },
+    {
+      "id": "offer-valid",
+      "profile": "ACT",
+      "spec_section": "7",
+      "input": "../examples/scenario-tickets/offer.json",
+      "expected": {
+        "verdict": "accept"
+      }
+    },
+    {
+      "id": "offer-expired-at-issue",
+      "profile": "ACT",
+      "spec_section": "7",
+      "input": "../examples/invalid/expired-offer/offer.json",
+      "expected": {
+        "verdict": "reject",
+        "error_code": "AJAR-OFFER-EXPIRED"
+      }
+    },
+    {
+      "id": "mandate-valid-ticket-purchase",
+      "profile": "ACT",
+      "spec_section": "8.1",
+      "input": "../examples/scenario-tickets/mandate.json",
+      "expected": {
+        "verdict": "accept"
+      }
+    },
+    {
+      "id": "mandate-cap-exceeded",
+      "profile": "ACT",
+      "spec_section": "8.1",
+      "input": "../examples/invalid/over-cap-commit/offer.json",
+      "context": {
+        "mandate": "../examples/invalid/over-cap-commit/mandate.json"
+      },
+      "expected": {
+        "verdict": "reject",
+        "error_code": "AJAR-MANDATE-CAP"
+      }
+    },
+    {
+      "id": "receipt-valid-ticket-purchase",
+      "profile": "ACT",
+      "spec_section": "8.2",
+      "input": "../examples/scenario-tickets/receipt.json",
+      "expected": {
+        "verdict": "accept"
+      }
+    }
+  ]
+}

@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spec.ajarprotocol.org/schemas/policy.schema.json",
+  "title": "Ajar Owner Policy",
+  "$comment": "docs/06-OWNER-CONTROL.md and docs/03-PROTOCOL-SPEC.md section 3 policy_summary.",
+  "type": "object",
+  "required": ["ajar_version", "exposure", "audience", "economics", "risk_gates", "observability"],
+  "properties": {
+    "ajar_version": { "$ref": "common.schema.json#/$defs/ajar_version" },
+    "exposure": {
+      "type": "object",
+      "required": ["include", "exclude"],
+      "properties": {
+        "include": { "type": "array", "items": { "type": "string" } },
+        "exclude": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": false
+    },
+    "audience": {
+      "type": "object",
+      "additionalProperties": { "type": "string", "enum": ["allow", "deny", "meter"] }
+    },
+    "economics": {
+      "type": "object",
+      "properties": {
+        "default_read_price": { "$ref": "common.schema.json#/$defs/money" },
+        "settlement": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": false
+    },
+    "risk_gates": {
+      "type": "object",
+      "required": ["R0", "R1", "R2", "R3"],
+      "properties": {
+        "R0": { "type": "string", "enum": ["auto", "mandate", "human_site", "deny"] },
+        "R1": { "type": "string", "enum": ["auto", "mandate", "human_site", "deny"] },
+        "R2": { "type": "string", "enum": ["auto", "mandate", "human_site", "deny"] },
+        "R3": { "type": "string", "enum": ["auto", "mandate", "human_site", "deny"] }
+      },
+      "additionalProperties": false
+    },
+    "observability": {
+      "type": "object",
+      "required": ["local_audit_log", "publish_transparency_log"],
+      "properties": {
+        "local_audit_log": { "type": "boolean" },
+        "publish_transparency_log": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spec.ajarprotocol.org/schemas/receipt.schema.json",
+  "title": "Ajar Receipt",
+  "$comment": "docs/03-PROTOCOL-SPEC.md section 8.2.",
+  "type": "object",
+  "required": ["ajar_version", "type", "receipt_id", "offer", "mandate_hash", "result_summary", "executed_at", "site_signature", "agent_signature"],
+  "properties": {
+    "ajar_version": { "$ref": "common.schema.json#/$defs/ajar_version" },
+    "type": { "const": "receipt" },
+    "receipt_id": { "type": "string", "pattern": "^urn:uuid:[0-9a-fA-F-]{36}$" },
+    "offer": { "$ref": "offer.schema.json" },
+    "mandate_hash": { "type": "string", "pattern": "^sha256:[A-Za-z0-9_-]+$" },
+    "result_summary": {
+      "type": "object",
+      "required": ["status"],
+      "properties": {
+        "status": { "type": "string", "enum": ["succeeded", "failed", "aborted"] },
+        "resource_ids": { "type": "array", "items": { "type": "string" } },
+        "message": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "executed_at": { "$ref": "common.schema.json#/$defs/date_time" },
+    "site_signature": { "$ref": "common.schema.json#/$defs/signature" },
+    "agent_signature": { "$ref": "common.schema.json#/$defs/signature" }
+  },
+  "additionalProperties": false
+}

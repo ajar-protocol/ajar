@@ -1,0 +1,77 @@
+{
+  "ajar_version": "0.1",
+  "supported_versions": ["0.1"],
+  "profiles": ["CORE", "PAY"],
+  "site": {
+    "name": "Example Docs",
+    "domain": "docs.example",
+    "description": "Documentation site with free signed reads for identified agents and metered anonymous reads.",
+    "languages": ["en"],
+    "contact": "protocol@docs.example"
+  },
+  "keys": {
+    "owner": {
+      "kty": "OKP",
+      "crv": "Ed25519",
+      "x": "ownerDocsPublicKeyExample001",
+      "kid": "owner-2026"
+    },
+    "operational": [
+      {
+        "key": {
+          "kty": "OKP",
+          "crv": "Ed25519",
+          "x": "opsDocsPublicKeyExample001",
+          "kid": "content-2026-07"
+        },
+        "scope": ["content-signing"],
+        "valid_until": "2026-10-01T00:00:00Z",
+        "certification": {
+          "alg": "Ed25519",
+          "kid": "owner-2026",
+          "sig": "certDocsContentSigner001"
+        }
+      }
+    ]
+  },
+  "views": {
+    "negotiation": ["application/ajar+json", "text/markdown"],
+    "index": "/ajar/views/index",
+    "chunking": {
+      "stable_ids": true,
+      "diff": "etag-per-chunk"
+    },
+    "license": {
+      "read": "metered",
+      "train": "denied",
+      "terms": "/terms/agent-access"
+    }
+  },
+  "policy_summary": {
+    "audience_tiers": ["anonymous", "signed", "verified"],
+    "rate_limits": {
+      "anonymous": "60/h",
+      "signed": "1000/h",
+      "verified": "5000/h"
+    },
+    "requires_mandate_from_risk": "R2"
+  },
+  "metering": {
+    "currency": "USD",
+    "read": {
+      "anonymous": "0.001/req",
+      "signed": "0",
+      "verified": "0"
+    },
+    "settlement": ["x402"],
+    "endpoint_402": true
+  },
+  "issued_at": "2026-07-02T00:00:00Z",
+  "expires_at": "2026-10-01T00:00:00Z",
+  "sequence": 7,
+  "signature": {
+    "alg": "Ed25519",
+    "kid": "owner-2026",
+    "sig": "manifestDocsSignature001"
+  }
+}

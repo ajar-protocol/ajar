@@ -15,13 +15,27 @@ Ajar is an owner-controlled semantic layer over HTTPS. It defines a signed Capab
 | `docs/01-RESEARCH.md` | Prior-art landscape and the honest novelty delta |
 | `GLOSSARY.md` | Canonical terminology |
 | `DECISIONS.md` | ADRs 001–017: why everything is the way it is |
-| `schemas/` | JSON Schemas (populated at Phase 0 task T0.4) |
-| `examples/` | Golden examples, valid + deliberately invalid (T0.5) |
-| `registries/` | Scope registry, error codes, settlement adapters (T0.3/T0.6) |
+| `schemas/` | JSON Schemas for manifests, views, actions, mandates, offers, receipts, policies, errors, and simulations |
+| `examples/` | Golden examples, valid + deliberately invalid |
+| `registries/` | Scope registry, error codes, settlement adapters |
+| `test-vectors/` | Seed conformance-vector data and MUST coverage |
 | `AEPs/` | Ajar Enhancement Proposals |
 
 ## Reading order
 Implementer: spec → schemas → examples → conformance suite. Newcomer: [`planning`](https://github.com/ajar-protocol/planning) first, then `docs/02-ARCHITECTURE.md`, then the spec. Reviewer: `docs/04-SECURITY-MODEL.md` + `DECISIONS.md`.
+
+## Validation
+
+```bash
+python -m pip install jsonschema
+python tools/validate_examples.py
+```
+
+CI runs the same validation for every push and pull request.
+
+The workflow template is in `ci/validate.yml`. Copy it to
+`.github/workflows/validate.yml` once the publishing account has workflow
+permission enabled.
 
 ## Changing the protocol
 Use AEPs; see `AEPs/README.md`. Anyone may propose changes, including independent implementers. Editorial fixes go by normal PR. Anything touching a MUST goes through an AEP.

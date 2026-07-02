@@ -1,0 +1,30 @@
+{
+  "ajar_version": "0.1",
+  "exposure": {
+    "include": ["/", "/docs/**", "/products/**"],
+    "exclude": ["/account/**", "/admin/**", "/checkout/session/**"]
+  },
+  "audience": {
+    "anonymous": "allow",
+    "signed": "allow",
+    "verified": "allow",
+    "contracted": "allow"
+  },
+  "economics": {
+    "default_read_price": {
+      "currency": "USD",
+      "amount": "0"
+    },
+    "settlement": ["x402", "offline-invoice"]
+  },
+  "risk_gates": {
+    "R0": "auto",
+    "R1": "auto",
+    "R2": "mandate",
+    "R3": "mandate"
+  },
+  "observability": {
+    "local_audit_log": true,
+    "publish_transparency_log": false
+  }
+}

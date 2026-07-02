@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spec.ajarprotocol.org/schemas/common.schema.json",
+  "title": "Ajar common schema definitions",
+  "$comment": "Shared terms from docs/03-PROTOCOL-SPEC.md sections 1, 2, 5, 8, and 10.",
+  "$defs": {
+    "ajar_version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+(\\.[0-9]+)?(-[A-Za-z0-9.-]+)?$"
+    },
+    "profile": {
+      "type": "string",
+      "enum": ["CORE", "ACT", "PAY", "FED"]
+    },
+    "risk": {
+      "type": "string",
+      "enum": ["R0", "R1", "R2", "R3"]
+    },
+    "uri_reference": {
+      "type": "string",
+      "minLength": 1
+    },
+    "https_uri": {
+      "type": "string",
+      "pattern": "^https://"
+    },
+    "date_time": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "scope": {
+      "type": "string",
+      "pattern": "^(content|commerce|communication|account|data|x-[a-z0-9-]+)(\\.[a-z0-9_*:-]+)+$"
+    },
+    "base64url": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]+$"
+    },
+    "jwk_ed25519": {
+      "type": "object",
+      "required": ["kty", "crv", "x", "kid"],
+      "properties": {
+        "kty": { "const": "OKP" },
+        "crv": { "const": "Ed25519" },
+        "x": { "$ref": "#/$defs/base64url" },
+        "kid": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": false
+    },
+    "signature": {
+      "type": "object",
+      "required": ["alg", "kid", "sig"],
+      "properties": {
+        "alg": { "const": "Ed25519" },
+        "kid": { "type": "string", "minLength": 1 },
+        "sig": { "$ref": "#/$defs/base64url" }
+      },
+      "additionalProperties": false
+    },
+    "money": {
+      "type": "object",
+      "required": ["currency", "amount"],
+      "properties": {
+        "currency": { "type": "string", "pattern": "^[A-Z]{3}$" },
+        "amount": { "type": "string", "pattern": "^[0-9]+(\\.[0-9]{1,9})?$" }
+      },
+      "additionalProperties": false
+    },
+    "effect": {
+      "type": "object",
+      "required": ["type"],
+      "properties": {
+        "type": { "type": "string", "pattern": "^[a-z0-9]+(\\.[a-z0-9_-]+)+$" },
+        "currency": { "type": "string", "pattern": "^[A-Z]{3}$" },
+        "amount": { "type": "string", "pattern": "^[0-9]+(\\.[0-9]{1,9})?$" },
+        "max": { "type": "string", "minLength": 1 },
+        "resource": { "type": "string", "minLength": 1 },
+        "reversible_until": { "type": "string", "minLength": 1 },
+        "description": { "type": "string" }
+      },
+      "additionalProperties": true
+    }
+  }
+}

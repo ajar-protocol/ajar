@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spec.ajarprotocol.org/schemas/error.schema.json",
+  "title": "Ajar RFC 9457 Problem",
+  "$comment": "docs/03-PROTOCOL-SPEC.md section 10 and registries/error-codes.md.",
+  "type": "object",
+  "required": ["type", "title", "status", "detail", "ajar_error_code"],
+  "properties": {
+    "type": { "type": "string", "format": "uri" },
+    "title": { "type": "string", "minLength": 1 },
+    "status": { "type": "integer", "minimum": 400, "maximum": 599 },
+    "detail": { "type": "string" },
+    "instance": { "type": "string" },
+    "ajar_error_code": { "type": "string", "pattern": "^AJAR-[A-Z]+-[A-Z0-9-]+$" },
+    "spec_section": { "type": "string" }
+  },
+  "additionalProperties": true
+}

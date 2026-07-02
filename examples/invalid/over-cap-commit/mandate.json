@@ -1,0 +1,50 @@
+{
+  "ajar_version": "0.1",
+  "type": "mandate",
+  "id": "urn:uuid:55555555-5555-4555-8555-555555555555",
+  "issuer": {
+    "kind": "principal",
+    "key": {
+      "kty": "OKP",
+      "crv": "Ed25519",
+      "x": "principalOverCapPublicKey001",
+      "kid": "principal-2026"
+    }
+  },
+  "subject": {
+    "kind": "agent",
+    "operator": "https://agent.example",
+    "key": {
+      "kty": "OKP",
+      "crv": "Ed25519",
+      "x": "agentOverCapPublicKey001",
+      "kid": "agent-2026"
+    }
+  },
+  "scopes": ["commerce.purchase.transport"],
+  "caps": {
+    "per_tx": {
+      "INR": 100000
+    },
+    "total": {
+      "INR": 100000
+    },
+    "count": 1
+  },
+  "constraints": {
+    "domains_allow": ["*.examplerail.example"],
+    "risk_max": "R3",
+    "forbidden": []
+  },
+  "valid_from": "2026-07-01T00:00:00Z",
+  "valid_until": "2026-07-31T23:59:59Z",
+  "revocation": {
+    "endpoint": "https://principal.example/ajar/revocations",
+    "cached_ttl": "PT10M"
+  },
+  "signature": {
+    "alg": "Ed25519",
+    "kid": "principal-2026",
+    "sig": "mandateOverCapSignature001"
+  }
+}

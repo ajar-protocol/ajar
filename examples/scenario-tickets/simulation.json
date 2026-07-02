@@ -1,0 +1,30 @@
+{
+  "ajar_version": "0.1",
+  "type": "simulation",
+  "action_id": "purchase_tickets",
+  "predicted_output": {
+    "booking_preview_id": "preview-50-seat-001",
+    "tickets": 50,
+    "route_id": "NDLS-BCT-2026-07-20-12952"
+  },
+  "resolved_effects": [
+    {
+      "type": "financial.charge",
+      "currency": "INR",
+      "amount": "175000"
+    },
+    {
+      "type": "resource.create",
+      "resource": "booking",
+      "reversible_until": "P2D"
+    }
+  ],
+  "total_cost": {
+    "currency": "INR",
+    "amount": "175000"
+  },
+  "validity_window": {
+    "valid_until": "2026-07-20T10:05:00Z"
+  },
+  "warnings": ["Seats are held only after commit."]
+}

@@ -1,0 +1,41 @@
+{
+  "cases": [
+    {
+      "id": "bad-signature",
+      "path": "bad-signature/manifest.json",
+      "schema": "manifest.schema.json",
+      "expected": "schema-fail",
+      "error_code": "AJAR-VERIFY-BAD-SIGNATURE",
+      "why": "signature.sig is not base64url, so the manifest shape fails before cryptographic verification."
+    },
+    {
+      "id": "expired-offer",
+      "path": "expired-offer/offer.json",
+      "schema": "offer.schema.json",
+      "expected": "semantic-fail",
+      "rule": "offer-expired-at-issue",
+      "error_code": "AJAR-OFFER-EXPIRED",
+      "why": "expires_at is earlier than issued_at."
+    },
+    {
+      "id": "over-cap-commit",
+      "path": "over-cap-commit/offer.json",
+      "schema": "offer.schema.json",
+      "expected": "semantic-fail",
+      "rule": "offer-exceeds-mandate-cap",
+      "mandate": "over-cap-commit/mandate.json",
+      "error_code": "AJAR-MANDATE-CAP",
+      "why": "Offer total INR 250000 exceeds the mandate per_tx cap INR 100000."
+    },
+    {
+      "id": "sequence-rollback",
+      "path": "sequence-rollback/current-manifest.json",
+      "schema": "manifest.schema.json",
+      "expected": "semantic-fail",
+      "rule": "manifest-sequence-rollback",
+      "last_seen_sequence": 42,
+      "error_code": "AJAR-VERIFY-ROLLBACK",
+      "why": "Current manifest sequence 41 is lower than the last accepted sequence 42."
+    }
+  ]
+}

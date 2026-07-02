@@ -1,0 +1,33 @@
+{
+  "ajar_version": "0.1",
+  "url": "https://notes.example/",
+  "content_type": "application/ajar+json",
+  "etag": "\"view-notes-home-001\"",
+  "language": "en",
+  "chunks": [
+    {
+      "id": "home.title",
+      "type": "heading",
+      "content": "Example Notes",
+      "hash": "sha256:homeTitleHash001",
+      "links": []
+    },
+    {
+      "id": "home.summary",
+      "type": "paragraph",
+      "content": "Signed notes for readers and agents.",
+      "hash": "sha256:homeSummaryHash001",
+      "links": [
+        {
+          "href": "/archive",
+          "rel": "index"
+        }
+      ]
+    }
+  ],
+  "signature": {
+    "alg": "Ed25519",
+    "kid": "content-2026-07",
+    "sig": "viewNotesSignature001"
+  }
+}

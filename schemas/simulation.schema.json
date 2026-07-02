@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spec.ajarprotocol.org/schemas/simulation.schema.json",
+  "title": "Ajar Simulation Result",
+  "$comment": "docs/03-PROTOCOL-SPEC.md section 6.",
+  "type": "object",
+  "required": ["ajar_version", "type", "action_id", "predicted_output", "resolved_effects", "total_cost", "validity_window", "warnings"],
+  "properties": {
+    "ajar_version": { "$ref": "common.schema.json#/$defs/ajar_version" },
+    "type": { "const": "simulation" },
+    "action_id": { "type": "string", "minLength": 1 },
+    "predicted_output": { "type": "object" },
+    "resolved_effects": {
+      "type": "array",
+      "items": { "$ref": "common.schema.json#/$defs/effect" }
+    },
+    "total_cost": { "$ref": "common.schema.json#/$defs/money" },
+    "validity_window": {
+      "type": "object",
+      "required": ["valid_until"],
+      "properties": {
+        "valid_until": { "$ref": "common.schema.json#/$defs/date_time" }
+      },
+      "additionalProperties": false
+    },
+    "warnings": { "type": "array", "items": { "type": "string" } }
+  },
+  "additionalProperties": false
+}

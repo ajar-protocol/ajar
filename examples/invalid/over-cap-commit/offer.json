@@ -1,0 +1,26 @@
+{
+  "ajar_version": "0.1",
+  "type": "offer",
+  "offer_id": "urn:uuid:66666666-6666-4666-8666-666666666666",
+  "action_id": "purchase_tickets",
+  "input_hash": "sha256:overCapInputHash001",
+  "resolved_effects": [
+    {
+      "type": "financial.charge",
+      "currency": "INR",
+      "amount": "250000"
+    }
+  ],
+  "total_cost": {
+    "currency": "INR",
+    "amount": "250000"
+  },
+  "issued_at": "2026-07-20T10:00:00Z",
+  "expires_at": "2026-07-20T10:10:00Z",
+  "single_use": true,
+  "signature": {
+    "alg": "Ed25519",
+    "kid": "offer-2026-07",
+    "sig": "offerOverCapSignature001"
+  }
+}

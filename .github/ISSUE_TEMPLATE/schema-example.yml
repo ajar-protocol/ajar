@@ -1,0 +1,24 @@
+name: Schema or example issue
+description: Report a schema, registry, or example problem.
+title: "[schema] "
+labels: ["schema", "examples", "triage"]
+body:
+  - type: input
+    id: file
+    attributes:
+      label: File
+      placeholder: "schemas/manifest.schema.json"
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: Explain the mismatch with the spec.
+    validations:
+      required: true
+  - type: textarea
+    id: validation
+    attributes:
+      label: Validation output
+      description: Paste output from tools/validate_examples.py if available.

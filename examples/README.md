@@ -2,11 +2,19 @@
 
 Golden examples — the living documentation of Ajar objects.
 
-**Status: empty by design.** Populated in Phase 0, task **T0.5**, after schemas (T0.4) exist.
+These examples are validated by `tools/validate_examples.py`. Valid examples
+MUST pass their schemas. Invalid examples MUST fail for the documented rule in
+`examples/invalid/index.json`.
 
-Planned contents:
-- `manifests/` — three archetypes: blog (CORE), docs site (CORE+PAY), commerce (CORE+ACT+PAY)
-- `scenario-tickets/` — the canonical 50-ticket walkthrough: mandate → simulation → offer → commit → receipt chain
-- `invalid/` — deliberately broken artifacts (bad signature, expired offer, over-cap commit, sequence rollback), each documenting the rule it violates and the expected `Ajar-Error-Code`
+Contents:
 
-Rule: every example is either validated by CI (valid set) or asserted to fail for its documented reason (invalid set). Examples that drift from the spec are bugs.
+- `manifests/` — blog CORE, docs CORE+PAY, commerce CORE+ACT+PAY
+- `views/` — signed semantic View example
+- `policies/` — owner policy example
+- `errors/` — RFC 9457 problem example
+- `scenario-tickets/` — mandate, simulation, offer, and receipt for the canonical 50-ticket purchase
+- `invalid/` — deliberately broken artifacts with expected `Ajar-Error-Code`
+
+The signature values are deterministic placeholders for schema and semantic
+validation. Cryptographic signing vectors are tracked separately from these
+shape examples.
