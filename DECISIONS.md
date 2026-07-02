@@ -15,7 +15,7 @@
 **Status:** accepted
 **Context:** Layers that scaled handed owners software + control (Apache, Let's Encrypt, WordPress); central conversion (AMP) was rejected. Existing owner controls (CDN crawl products) are proprietary and read-only. We cannot and should not do the web's work centrally.
 **Decision:** Self-hosted Gateway; Owner Key signs everything; automation drafts, owners decide; no runtime dependence on the project; safe defaults (nothing → read-only → explicit per-action opt-in).
-**Consequences:** Slower per-site onboarding than a central service, but the only path that scales, earns owner trust, and survives us. Defines docs/06 in full.
+**Consequences:** Slower per-site onboarding than a central service, but the only path that scales, earns owner trust, and survives us. Defines docs/05 in full.
 
 ## ADR-003 — The model is untrusted; enforcement is deterministic
 **Status:** accepted
@@ -51,7 +51,7 @@
 **Status:** accepted
 **Context:** Per-request LLM extraction is slow, costly, non-deterministic, and un-auditable. Template clustering makes build-time induction scale with templates, not pages.
 **Decision:** LLMs label samples and emit extraction rules/config at build time (Inducer); the serve path is pure deterministic code; drift detection triggers re-induction.
-**Consequences:** Cheap, fast, auditable serving; a hard tail of sites needs owner-side integration instead (documented in 07 §4).
+**Consequences:** Cheap, fast, auditable serving; a hard tail of sites needs owner-side integration instead (tracked in the planning repo roadmap).
 
 ## ADR-009 — Implementation language: Rust core
 **Status:** accepted

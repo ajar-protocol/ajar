@@ -14,6 +14,18 @@
       "expected": "allow"
     },
     {
+      "id": "scope-wildcard-commerce-purchase-grandchild",
+      "mandate_scopes": ["commerce.purchase.*"],
+      "required_scope": "commerce.purchase.transport.rail",
+      "expected": "allow"
+    },
+    {
+      "id": "scope-wildcard-does-not-match-parent",
+      "mandate_scopes": ["commerce.purchase.*"],
+      "required_scope": "commerce.purchase",
+      "expected": "deny"
+    },
+    {
       "id": "scope-sibling-denied",
       "mandate_scopes": ["commerce.purchase.transport"],
       "required_scope": "commerce.purchase.event",

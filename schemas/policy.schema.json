@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://spec.ajarprotocol.org/schemas/policy.schema.json",
   "title": "Ajar Owner Policy",
-  "$comment": "docs/06-OWNER-CONTROL.md and docs/03-PROTOCOL-SPEC.md section 3 policy_summary.",
+  "$comment": "docs/05-OWNER-CONTROL.md and docs/03-PROTOCOL-SPEC.md section 3 policy_summary.",
   "type": "object",
   "required": ["ajar_version", "exposure", "audience", "economics", "risk_gates", "observability"],
   "properties": {

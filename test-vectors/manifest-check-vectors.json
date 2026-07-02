@@ -23,7 +23,7 @@
       "served_path": "/ajar.json",
       "expected": {
         "valid": false,
-        "contains": "AJAR-POLICY-DENIED"
+        "contains": "AJAR-MANIFEST-LOCATION"
       }
     },
     {
@@ -38,6 +38,15 @@
     {
       "id": "manifest-check-expired-invalid",
       "manifest": "examples/invalid/expired-manifest/manifest.json",
+      "served_path": "/.well-known/ajar.json",
+      "expected": {
+        "valid": false,
+        "contains": "AJAR-VERIFY-EXPIRED"
+      }
+    },
+    {
+      "id": "manifest-check-lifetime-over-180d-invalid",
+      "manifest": "examples/invalid/manifest-lifetime-over-180d/manifest.json",
       "served_path": "/.well-known/ajar.json",
       "expected": {
         "valid": false,

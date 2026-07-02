@@ -25,7 +25,7 @@
       },
       "expected": {
         "verdict": "reject",
-        "error_code": "AJAR-POLICY-DENIED"
+        "error_code": "AJAR-MANIFEST-LOCATION"
       }
     },
     {
@@ -110,6 +110,96 @@
       }
     },
     {
+      "id": "offer-never-issued",
+      "spec_section": "7",
+      "kind": "commit_offer_state",
+      "input": {
+        "offer_id": "urn:uuid:99999999-9999-4999-8999-999999999999",
+        "known_offers": [],
+        "committed_offers": []
+      },
+      "expected": {
+        "verdict": "reject",
+        "error_code": "AJAR-OFFER-NOT-FOUND"
+      }
+    },
+    {
+      "id": "offer-replay-single-use",
+      "spec_section": "7",
+      "kind": "commit_offer_state",
+      "input": {
+        "offer_id": "urn:uuid:22222222-2222-4222-8222-222222222222",
+        "known_offers": ["urn:uuid:22222222-2222-4222-8222-222222222222"],
+        "committed_offers": ["urn:uuid:22222222-2222-4222-8222-222222222222"],
+        "single_use": true
+      },
+      "expected": {
+        "verdict": "reject",
+        "error_code": "AJAR-OFFER-REPLAY"
+      }
+    },
+    {
+      "id": "mandate-missing-on-r2-action",
+      "spec_section": "8.1",
+      "kind": "mandate_required",
+      "input": {
+        "action_risk": "R2",
+        "mandate_present": false
+      },
+      "expected": {
+        "verdict": "reject",
+        "error_code": "AJAR-MANDATE-MISSING"
+      }
+    },
+    {
+      "id": "mandate-revoked",
+      "spec_section": "8.1",
+      "kind": "mandate_status",
+      "input": {
+        "valid_from": "2026-07-01T00:00:00Z",
+        "valid_until": "2026-07-31T23:59:59Z",
+        "now": "2026-07-20T10:00:00Z",
+        "revoked": true,
+        "revocation_fresh": true
+      },
+      "expected": {
+        "verdict": "reject",
+        "error_code": "AJAR-MANDATE-REVOKED"
+      }
+    },
+    {
+      "id": "mandate-revocation-status-stale",
+      "spec_section": "8.1",
+      "kind": "mandate_status",
+      "input": {
+        "valid_from": "2026-07-01T00:00:00Z",
+        "valid_until": "2026-07-31T23:59:59Z",
+        "now": "2026-07-20T10:00:00Z",
+        "revoked": false,
+        "revocation_fresh": false
+      },
+      "expected": {
+        "verdict": "reject",
+        "error_code": "AJAR-MANDATE-REVOKED"
+      }
+    },
+    {
+      "id": "mandate-outside-validity-window",
+      "spec_section": "8.1",
+      "kind": "mandate_status",
+      "input": {
+        "valid_from": "2026-07-01T00:00:00Z",
+        "valid_until": "2026-07-31T23:59:59Z",
+        "now": "2026-08-01T00:00:00Z",
+        "revoked": false,
+        "revocation_fresh": true
+      },
+      "expected": {
+        "verdict": "reject",
+        "error_code": "AJAR-VERIFY-EXPIRED"
+      }
+    },
+    {
       "id": "simulate-endpoints-equivalent",
       "spec_section": "6",
       "kind": "simulate_equivalence",
@@ -128,6 +218,43 @@
       "input": {
         "header_mode_hash": "sha256:simulationResultHash001",
         "subresource_hash": "sha256:differentSimulationResultHash001"
+      },
+      "expected": {
+        "verdict": "reject",
+        "error_code": "AJAR-SIMULATE-DIVERGED"
+      }
+    },
+    {
+      "id": "offer-materially-diverged-from-simulation",
+      "spec_section": "6",
+      "kind": "simulation_offer_binding",
+      "input": {
+        "simulation_input_hash": "sha256:ticketInputHash001",
+        "offer_input_hash": "sha256:ticketInputHash001",
+        "simulation_valid_until": "2026-07-20T10:05:00Z",
+        "offer_issued_at": "2026-07-20T10:03:00Z",
+        "simulation_resolved_effects": [
+          {
+            "type": "financial.charge",
+            "currency": "INR",
+            "amount": "175000"
+          }
+        ],
+        "offer_resolved_effects": [
+          {
+            "type": "financial.charge",
+            "currency": "INR",
+            "amount": "185000"
+          }
+        ],
+        "simulation_total_cost": {
+          "currency": "INR",
+          "amount": "175000"
+        },
+        "offer_total_cost": {
+          "currency": "INR",
+          "amount": "185000"
+        }
       },
       "expected": {
         "verdict": "reject",

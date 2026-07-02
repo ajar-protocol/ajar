@@ -11,7 +11,7 @@ Ajar is an owner-controlled semantic layer over HTTPS. It defines a signed Capab
 | `docs/03-PROTOCOL-SPEC.md` | The normative spec (v0.1 draft). Start here as an implementer |
 | `docs/02-ARCHITECTURE.md` | End-to-end system design + canonical walkthrough |
 | `docs/04-SECURITY-MODEL.md` | Threat catalogue, mitigations, accepted residuals |
-| `docs/06-OWNER-CONTROL.md` | Owner-control policy model |
+| `docs/05-OWNER-CONTROL.md` | Owner-control policy model |
 | `docs/01-RESEARCH.md` | Prior-art landscape and the honest novelty delta |
 | `GLOSSARY.md` | Canonical terminology |
 | `DECISIONS.md` | ADRs 001–017: why everything is the way it is |
@@ -38,8 +38,8 @@ python3 tools/check_phase0.py
 Expected result:
 
 ```text
-Validated 12 valid examples, 6 invalid examples, 4 signing vectors, 2 HTTP signature vectors, 5 extension vectors, 5 manifest check vectors, 10 core vectors, 18 runtime vectors, and 10 scope vectors.
-MUST coverage OK: 21 requirements mapped.
+Validated 12 valid examples, 8 invalid examples, 4 signing vectors, 2 HTTP signature vectors, 5 extension vectors, 6 manifest check vectors, 11 core vectors, 25 runtime vectors, and 12 scope vectors.
+MUST coverage OK: 24 requirements mapped.
 ```
 
 `make validate` runs schema/example/vector validation, local Markdown link

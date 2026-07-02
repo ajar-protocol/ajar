@@ -1,4 +1,4 @@
-# 06 - Owner Control: Sovereignty & Policy Model
+# 05 - Owner Control: Sovereignty & Policy Model
 
 Ajar is not a central service that opens websites to agents. It is a standard and software stack that lets site owners decide what agents can read or do. This document defines the policy surface and the owner experience.
 
@@ -32,6 +32,8 @@ Tiers, each independently configurable per resource/action:
 | `verified` | Signed + operator on a trust list the owner subscribes to (or self-curates) |
 | `allowlist` | Explicit operator/principal identities the owner named |
 | `contracted` | Allowlist + an active standing mandate/agreement on file |
+
+The trust-list format, subscription mechanism, and verification semantics are not defined in v0.1; `verified`-tier interop across Gateways is deferred (see PHASE-0-REVIEW.md deferred questions).
 
 Owners may also express *denylist* entries and per-operator overrides ("Operator X: read yes, actions no").
 

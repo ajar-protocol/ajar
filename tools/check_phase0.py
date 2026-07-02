@@ -127,10 +127,10 @@ def check_local_validation(failures: list[str]) -> None:
     except subprocess.CalledProcessError as exc:
         failures.append(f"make validate failed:\n{exc.stdout}\n{exc.stderr}")
         return
-    expected = "Validated 12 valid examples, 6 invalid examples, 4 signing vectors, 2 HTTP signature vectors, 5 extension vectors, 5 manifest check vectors, 10 core vectors, 18 runtime vectors, and 10 scope vectors."
+    expected = "Validated 12 valid examples, 8 invalid examples, 4 signing vectors, 2 HTTP signature vectors, 5 extension vectors, 6 manifest check vectors, 11 core vectors, 25 runtime vectors, and 12 scope vectors."
     if expected not in output:
         failures.append("make validate output did not include expected vector summary")
-    if "MUST coverage OK: 21 requirements mapped." not in output:
+    if "MUST coverage OK: 24 requirements mapped." not in output:
         failures.append("make validate output did not include expected MUST coverage summary")
 
 

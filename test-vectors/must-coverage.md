@@ -1,22 +1,32 @@
 # MUST Coverage Seed
 
-This table maps normative requirements to vector coverage. Rows marked with a
-vector are executed by `tools/validate_examples.py`; rows marked as harness
-follow-up need an implementation-facing network or runtime harness outside this
-spec repo.
+This table is rendered from `test-vectors/must-coverage.json`. Rows with a
+`Follow-up` marker have executable seed vectors but still need implementation-facing
+harness coverage for the noted sub-clauses.
 
-| Spec section | Normative requirement | Vector |
-|---|---|---|
-| 2.1 | A conforming site MUST serve its manifest at `/.well-known/ajar.json` | `http-manifest-well-known-location`, `http-manifest-wrong-location` |
-| 2.3 | Agents MUST sign requests with HTTP Message Signatures | `agent-request-signature-valid`, `agent-request-signature-tampered-target` |
-| 2.4 | Durable artifacts MUST use the canonical signing profile | `crypto-signing.json`, `manifest-bad-signature-shape` |
-| 3 | Invalid manifest verification MUST fail closed to fallback | `manifest-bad-signature-shape`, `manifest-sequence-rollback` |
-| 4 | Clients MUST treat chunks as inert data with provenance | `view-chunks-provenance-tagged`, `view-chunk-executable-rejected` |
-| 5.1 | Owner policy may never lower risk-class protocol floors | `action-risk-floor-lowered` |
-| 6 | R1+ actions marked `simulate: true` MUST support SIMULATE | `manifest-act-pay-valid` |
-| 6 | Clients MUST simulate before any R2/R3 propose | `client-r3-propose-without-simulate`, `client-r3-propose-after-simulate` |
-| 7 | Expired offers MUST fail closed | `offer-expired-at-issue` |
-| 8.1 | Sites MUST verify mandate signature, validity, scope, caps, and revocation | `mandate-cap-exceeded`, `scope-exact-commerce-purchase`, `scope-wildcard-commerce-purchase-child`, `scope-forbidden-exact-overrides-wildcard` |
-| 8.2 | Both parties MUST retain receipts | `receipt-valid-ticket-purchase` |
-| 9 | Fallback MUST NOT execute R2/R3-equivalent operations without human confirmation | `fallback-r3-without-human`, `fallback-r3-with-human` |
-| 13 | Private extensions MUST use `x-<vendor>-` prefixes | `extension-manifest-x-field-accepted`, `extension-manifest-unprefixed-field-rejected`, `extension-action-x-field-accepted`, `extension-offer-x-field-accepted`, `extension-offer-unprefixed-field-rejected` |
+| Spec section | Requirement ID | Normative requirement | Vectors | Follow-up |
+|---|---|---|---|---|
+| 1 | `must-extensibility-unknown-fields` | 4. **Extensibility:** every object carries `ajar_version` (semver); unknown fields MUST be ignored per the extension policy in §13; breaking changes bump major version; clients negotiate via the manifest's `supported_versions`. | `extension-manifest-x-field-accepted`, `extension-manifest-unprefixed-field-rejected` |  |
+| 2.1 | `must-manifest-location` | A conforming site MUST serve its manifest at: | `http-manifest-well-known-location`, `http-manifest-wrong-location` |  |
+| 2.2 | `must-owner-key-domain-binding` | - The **Owner Key** (Ed25519) is the site's root of authority. Its public half appears in the manifest AND MUST be provable against the domain via at least one of: DNS TXT record (`_ajar.<domain>`), or the TLS-served manifest itself plus transparency-log history (trust-on-first-use hardened by logs). | `manifest-domain-binding-valid`, `manifest-domain-binding-mismatch` |  |
+| 2.3 | `must-agent-http-signatures` | Agents MUST sign requests with HTTP Message Signatures (RFC 9421, `tag="ajar"`), interoperable with Web Bot Auth: `Signature-Agent` points to the operator's key directory (`/.well-known/http-message-signatures-directory`). `Ajar-Date` is an RFC 3339 request timestamp; it MUST be included in the signature base; receivers MUST reject requests older than the freshness window they advertise. Anonymous access is at the owner's policy discretion (tier `anonymous`). | `agent-request-signature-valid`, `agent-request-signature-tampered-target` | Freshness-window rejection needs an implementation-facing HTTP harness. |
+| 2.4 | `must-kid-resolution` | 5. Store the signer key id in `kid`. Verifiers MUST resolve `kid` from the relevant owner, operational, principal, or agent key directory before accepting the signature. | `signature-kid-known`, `signature-kid-unknown` |  |
+| 3 | `must-manifest-expiry` | "expires_at": "2026-10-01T00:00:00Z",               // manifests MUST expire (max 180d) | `manifest-check-expired-invalid`, `manifest-check-lifetime-over-180d-invalid` |  |
+| 3 | `must-manifest-lifetime-cap` | Manifest lifetime is capped at 180 days. Verifiers MUST reject manifests whose `expires_at` is more than 180 days after `issued_at`. | `manifest-check-lifetime-over-180d-invalid`, `manifest-lifetime-over-180d` |  |
+| 4 | `must-view-provenance` | - **Provenance:** every chunk is data, never instructions. Clients MUST tag chunks with origin and treat them as inert in model context (see 04-SECURITY-MODEL). | `view-chunks-provenance-tagged`, `view-chunk-executable-rejected` |  |
+| 5 | `must-r1-simulate-flag` | "simulate": true,                               // MUST be true for R1+ (§6) | `manifest-act-pay-valid`, `action-risk-floor-lowered` |  |
+| 5 | `must-r1-idempotency-key` | "idempotency": "required",                      // Idempotency-Key header, R1+ MUST | `manifest-act-pay-valid`, `action-risk-floor-lowered` |  |
+| 6 | `must-simulate-same-input` | Every action with `simulate: true` MUST accept the same input at: | `simulate-endpoints-equivalent`, `simulate-endpoints-diverged` |  |
+| 6 | `must-simulate-equivalent-endpoints` | (Equivalently `.../simulate` sub-resource; both MUST behave identically.) | `simulate-endpoints-equivalent`, `simulate-endpoints-diverged` |  |
+| 6 | `must-client-simulate-before-propose` | - Clients (Kernel) MUST simulate before any R2/R3 propose, and MUST re-check the *simulation result* — not the model's belief — against the mandate. | `client-r3-propose-without-simulate`, `client-r3-propose-after-simulate` |  |
+| 6 | `must-reject-simulate-divergence` | - **Binding-ish honesty:** predictions are not offers. An Offer materially diverges from a simulation when, for the same canonical input within the simulation's `validity_window`, the offer's `resolved_effects` differ or its `total_cost` exceeds the simulated `total_cost`. Kernels MUST reject materially diverged offers (AJAR-SIMULATE-DIVERGED). Repeated material divergence constitutes misrepresentation (§8.4). | `offer-materially-diverged-from-simulation` |  |
+| 7 | `must-expired-offer-fail-closed` | 3. Either side may **abort**; expired offers are void; commit of an expired/never-issued offer MUST fail closed. | `offer-expired-at-issue`, `offer-never-issued` |  |
+| 7 | `must-offer-single-use-replay` | `{ ajar_version, type, offer_id, action_id, input_hash, resolved_effects, total_cost, issued_at, expires_at, single_use?, signature }` (freeze window: owner-configured, default 10 min). When `single_use` is true or omitted, committing the same `offer_id` twice MUST fail with AJAR-OFFER-REPLAY. | `offer-replay-single-use` |  |
+| 8.1 | `must-site-verify-mandate` | - Sites MUST verify: signature, validity window, scope ⊇ action requirement, caps ≥ resolved cost, revocation status. Revocation status may be cached up to `cached_ttl`; within that window a failed refresh MAY rely on the cache. With no cached status fresh within `cached_ttl`, the site MUST fail closed with AJAR-MANDATE-REVOKED. | `mandate-valid-ticket-purchase`, `mandate-missing-on-r2-action`, `mandate-cap-exceeded`, `mandate-revoked`, `mandate-revocation-status-stale`, `mandate-outside-validity-window`, `scope-exact-commerce-purchase`, `scope-wildcard-commerce-purchase-child`, `scope-wildcard-commerce-purchase-grandchild`, `scope-forbidden-exact-overrides-wildcard` | Mandate signature cryptographic verification and domain matching need fuller harness coverage. |
+| 8.2 | `must-retain-receipts` | Dual-signed record: `{ receipt_id, offer (embedded), mandate_hash, result_summary, executed_at, site_signature, agent_signature }`. Both parties MUST retain receipts (site: per policy retention; kernel: Receipt Vault). Receipts are the atoms of dispute resolution and regulatory audit. | `receipt-valid-ticket-purchase` |  |
+| 9 | `must-fallback-rules` | Clients MAY interact with non-Ajar sites via rendering/extraction, but MUST: honor robots.txt / AIPREF signals and 402 challenges; identify themselves via signed requests; flag all derived content `unverified`; and MUST NOT execute R2/R3-equivalent operations without explicit human confirmation per operation. Fallback is a transition path, not a peer mode. | `fallback-r3-without-human`, `fallback-r3-with-human` | robots.txt/AIPREF, 402 honoring, signed self-identification, and unverified flagging are not yet vectored. |
+| 10 | `must-idempotency-header` | \| Idempotency \| `Idempotency-Key: <uuid>` (R1+ MUST) \| | `manifest-act-pay-valid`, `action-risk-floor-lowered` | Only manifest shape/risk-floor validation is vectored; HTTP idempotency behavior needs harness coverage. |
+| 13 | `must-breaking-major-version` | - Breaking changes MUST bump the major version and include a migration note. | `breaking-change-major-bump`, `breaking-change-without-major-bump` |  |
+| 13 | `must-unknown-fields` | - Unknown fields MUST be ignored unless they appear in an object position where the schema has `additionalProperties: false`. | `extension-manifest-x-field-accepted`, `extension-manifest-unprefixed-field-rejected` |  |
+| 13 | `must-private-extension-prefix` | - Private extension fields and settlement adapters MUST use `x-<vendor>-` prefixes. Private scopes MUST use `x-<vendor>.` prefixes because `.` is the scope segment separator. | `extension-action-x-field-accepted`, `extension-offer-x-field-accepted`, `scope-private-matches-private`, `scope-private-does-not-match-core` |  |
+| 13 | `must-public-extension-aep` | - Public extensions that affect interoperability MUST go through the AEP process. | `public-extension-with-aep`, `public-extension-without-aep` |  |

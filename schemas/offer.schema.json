@@ -19,7 +19,7 @@
     "total_cost": { "$ref": "common.schema.json#/$defs/money" },
     "issued_at": { "$ref": "common.schema.json#/$defs/date_time" },
     "expires_at": { "$ref": "common.schema.json#/$defs/date_time" },
-    "single_use": { "type": "boolean" },
+    "single_use": { "type": "boolean", "default": true },
     "signature": { "$ref": "common.schema.json#/$defs/signature" }
   },
   "patternProperties": {

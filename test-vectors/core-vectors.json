@@ -30,7 +30,7 @@
       "rule": "schema-fail",
       "expected": {
         "verdict": "reject",
-        "error_code": "AJAR-VERIFY-BAD-SIGNATURE"
+        "error_code": "AJAR-SCHEMA-INVALID"
       }
     },
     {
@@ -58,6 +58,18 @@
       "expected": {
         "verdict": "reject",
         "error_code": "AJAR-ACTION-RISK-FLOOR"
+      }
+    },
+    {
+      "id": "manifest-lifetime-over-180d",
+      "profile": "CORE",
+      "spec_section": "3",
+      "schema": "manifest.schema.json",
+      "input": "../examples/invalid/manifest-lifetime-over-180d/manifest.json",
+      "rule": "manifest-lifetime-over-180d",
+      "expected": {
+        "verdict": "reject",
+        "error_code": "AJAR-VERIFY-EXPIRED"
       }
     },
     {

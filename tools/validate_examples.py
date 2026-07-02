@@ -134,6 +134,9 @@ def semantic_failure(case: dict, instance: dict, base_dir: Path) -> bool:
     if rule == "manifest-expired-at-issue":
         return parse_dt(instance["expires_at"]) <= parse_dt(instance["issued_at"])
 
+    if rule == "manifest-lifetime-over-180d":
+        return (parse_dt(instance["expires_at"]) - parse_dt(instance["issued_at"])).total_seconds() > 180 * 24 * 60 * 60
+
     raise ValueError(f"Unknown invalid semantic rule: {rule}")
 
 
@@ -378,7 +381,14 @@ def validate_must_coverage() -> list[str]:
     manifest_check_ids = {vector["id"] for vector in load_json(TEST_VECTORS / "manifest-check-vectors.json")["vectors"]}
     vector_ids = core_ids | runtime_ids | scope_ids | http_ids | extension_ids | manifest_check_ids
     text = (TEST_VECTORS / "must-coverage.md").read_text(encoding="utf-8")
-    for token in re.findall(r"`([^`]+)`", text):
+    vector_cells: list[str] = []
+    for line in text.splitlines():
+        if not line.startswith("|") or line.startswith("|---") or "Requirement ID" in line:
+            continue
+        cells = [cell.strip() for cell in re.split(r"(?<!\\)\|", line.strip("|"))]
+        if len(cells) >= 4:
+            vector_cells.append(cells[3])
+    for token in re.findall(r"`([^`]+)`", "\n".join(vector_cells)):
         if token.startswith("/") or token.endswith(".json"):
             continue
         if "/" in token:
@@ -423,7 +433,7 @@ def runtime_verdict(vector: dict) -> tuple[str, str | None]:
     if kind == "http_surface":
         if data["method"] == "GET" and data["path"] == "/.well-known/ajar.json" and data["serves_manifest"]:
             return "accept", None
-        return "reject", "AJAR-POLICY-DENIED"
+        return "reject", "AJAR-MANIFEST-LOCATION"
 
     if kind == "domain_binding":
         if data["owner_key_present"] and data["manifest_domain"] == data["request_domain"] and data["proof"] in {"dns-txt", "transparency-log"}:
@@ -440,10 +450,45 @@ def runtime_verdict(vector: dict) -> tuple[str, str | None]:
             return "reject", "AJAR-SIMULATE-REQUIRED"
         return "accept", None
 
+    if kind == "commit_offer_state":
+        offer_id = data["offer_id"]
+        known_offers = set(data.get("known_offers", []))
+        committed_offers = set(data.get("committed_offers", []))
+        if offer_id not in known_offers:
+            return "reject", "AJAR-OFFER-NOT-FOUND"
+        if data.get("single_use", True) and offer_id in committed_offers:
+            return "reject", "AJAR-OFFER-REPLAY"
+        return "accept", None
+
+    if kind == "mandate_required":
+        if data["action_risk"] in {"R2", "R3"} and not data.get("mandate_present", False):
+            return "reject", "AJAR-MANDATE-MISSING"
+        return "accept", None
+
+    if kind == "mandate_status":
+        if data.get("revoked", False):
+            return "reject", "AJAR-MANDATE-REVOKED"
+        now = parse_dt(data["now"])
+        if now < parse_dt(data["valid_from"]) or now > parse_dt(data["valid_until"]):
+            return "reject", "AJAR-VERIFY-EXPIRED"
+        if not data.get("revocation_fresh", True):
+            return "reject", "AJAR-MANDATE-REVOKED"
+        return "accept", None
+
     if kind == "simulate_equivalence":
         if data["header_mode_hash"] == data["subresource_hash"]:
             return "accept", None
         return "reject", "AJAR-SIMULATE-DIVERGED"
+
+    if kind == "simulation_offer_binding":
+        same_input = data["simulation_input_hash"] == data["offer_input_hash"]
+        within_window = parse_dt(data["offer_issued_at"]) <= parse_dt(data["simulation_valid_until"])
+        effects_match = data["simulation_resolved_effects"] == data["offer_resolved_effects"]
+        simulation_cost = Decimal(data["simulation_total_cost"]["amount"])
+        offer_cost = Decimal(data["offer_total_cost"]["amount"])
+        if same_input and within_window and (not effects_match or offer_cost > simulation_cost):
+            return "reject", "AJAR-SIMULATE-DIVERGED"
+        return "accept", None
 
     if kind == "view_provenance":
         view = load_json(ROOT / data["view"])

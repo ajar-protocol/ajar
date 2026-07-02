@@ -15,17 +15,18 @@
 | **Chunk** | Addressable unit of a View with a stable ID and content hash; unit of diff sync and provenance tagging. |
 | **View Index** | Machine sitemap: chunk map + hashes + change hints, for full/incremental sync planning. |
 | **Action** | A typed, owner-published operation: schemas, risk class, effects, endpoint, execution mode. |
+| **AEP** | Ajar Enhancement Proposal — the change process for the spec, schemas, and registries; see AEPs/README.md. |
 | **Risk class (R0–R3)** | Normative effect taxonomy: R0 read, R1 reversible write, R2 irreversible write, R3 financial/legal. Sets protocol floors. |
 | **Effects** | Machine-readable consequence declaration on an Action (and resolved concretely in SIMULATE/Offers). |
-| **SIMULATE** | Mandatory dry-run mode for R1+ Actions: identical input, zero side effects, faithful resolved prediction. |
+| **SIMULATE** | Dry-run mode supported for R1+ Actions; mandatory for clients before R2/R3. |
 | **Two-phase execution** | Propose → Commit ceremony required for R2/R3. |
 | **Offer** | Site-signed frozen proposal produced by Propose: resolved effects, total cost, expiry. Single-use. |
-| **Commit** | Agent's countersigned acceptance of an Offer (over offer‖mandate), triggering execution. |
+| **Commit** | Agent's countersigned acceptance of an Offer (over offer_hash ‖ mandate_hash), triggering execution. |
 | **Receipt** | Dual-signed record binding Mandate + Offer + result. The atom of accountability and dispute resolution. |
 | **Principal** | The human/organization on whose behalf an agent acts; issues Mandates. |
 | **Agent** | The acting software system: model + Kernel + operator infrastructure. |
 | **Agent operator** | The party running the agent (may equal the Principal). Identified via signed requests. |
-| **Kernel** (Client/Kernel) | Agent-side runtime: Resolver, Taint Boundary, Policy Monitor, Simulator, Executor, Receipt Vault, Fallback Engine. The model is outside its trust boundary. |
+| **Kernel** (Client/Kernel) | Agent-side runtime: Resolver, Taint Boundary, Policy Monitor, Simulator, Executor, Mandate Store, Receipt Vault, Fallback Engine. The model is outside its trust boundary. |
 | **Mandate** | Principal-signed, scoped, time-boxed, capped authorization carried by an agent. UCAN-compatible delegation chains. |
 | **Standing Mandate** | A Mandate with recurrence caps and long validity — the org↔org contract primitive (e.g., recurring invoices). |
 | **Scope** | Dotted permission name from the registry (e.g., `commerce.purchase.transport`). |
@@ -33,6 +34,7 @@
 | **Taint Boundary** | Kernel mechanism ensuring site content enters the model as provenance-tagged inert data. |
 | **Receipt Vault** | Kernel's append-only local store of verdicts, artifacts, and receipts — the agent-side audit trail. |
 | **Fallback Engine** | Kernel module for manifest-less sites: consensual headless rendering + extraction, output flagged `unverified`. |
+| **Trust list** | Operator list an owner subscribes to (or self-curates) for the `verified` tier. Format and cross-Gateway interop semantics are undefined in v0.1 (deferred). |
 | **Owner Policy** | The owner's declarative configuration across five axes: exposure, audience, economics, risk gates, observability. |
 | **Tier** | Audience level: `anonymous`, `signed`, `verified`, `allowlist`, `contracted`. |
 | **Gate** | Execution ceremony setting per action: `auto`, `mandate`, `human_site`, `threshold(x)`, `deny`. |

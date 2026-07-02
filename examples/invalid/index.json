@@ -5,7 +5,7 @@
       "path": "bad-signature/manifest.json",
       "schema": "manifest.schema.json",
       "expected": "schema-fail",
-      "error_code": "AJAR-VERIFY-BAD-SIGNATURE",
+      "error_code": "AJAR-SCHEMA-INVALID",
       "why": "signature.sig is not base64url, so the manifest shape fails before cryptographic verification."
     },
     {
@@ -45,6 +45,23 @@
       "rule": "manifest-expired-at-issue",
       "error_code": "AJAR-VERIFY-EXPIRED",
       "why": "expires_at is earlier than issued_at."
+    },
+    {
+      "id": "manifest-lifetime-over-180d",
+      "path": "manifest-lifetime-over-180d/manifest.json",
+      "schema": "manifest.schema.json",
+      "expected": "semantic-fail",
+      "rule": "manifest-lifetime-over-180d",
+      "error_code": "AJAR-VERIFY-EXPIRED",
+      "why": "expires_at is more than 180 days after issued_at."
+    },
+    {
+      "id": "middle-wildcard-scope",
+      "path": "middle-wildcard-scope/manifest.json",
+      "schema": "manifest.schema.json",
+      "expected": "schema-fail",
+      "error_code": "AJAR-SCHEMA-INVALID",
+      "why": "Scope wildcards are suffix-only; commerce.*.ticket is invalid."
     },
     {
       "id": "risk-floor-lowered",

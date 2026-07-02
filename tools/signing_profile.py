@@ -136,7 +136,7 @@ def canonical_json_bytes(value: object) -> bytes:
 
 def signing_payload(artifact: dict, artifact_type: str) -> dict:
     payload = copy.deepcopy(artifact)
-    if artifact_type in {"manifest", "mandate", "offer"}:
+    if artifact_type in {"manifest", "mandate", "offer", "view"}:
         payload.pop("signature", None)
     elif artifact_type == "receipt":
         payload.pop("site_signature", None)
@@ -198,13 +198,13 @@ def build_parser() -> argparse.ArgumentParser:
     public.set_defaults(func=command_public_key)
 
     sign = subcommands.add_parser("sign")
-    sign.add_argument("--type", required=True, choices=["manifest", "mandate", "offer", "receipt"])
+    sign.add_argument("--type", required=True, choices=["manifest", "mandate", "offer", "receipt", "view"])
     sign.add_argument("--seed-hex", required=True)
     sign.add_argument("artifact", type=Path)
     sign.set_defaults(func=command_sign)
 
     verify = subcommands.add_parser("verify")
-    verify.add_argument("--type", required=True, choices=["manifest", "mandate", "offer", "receipt"])
+    verify.add_argument("--type", required=True, choices=["manifest", "mandate", "offer", "receipt", "view"])
     verify.add_argument("--public-key", required=True)
     verify.add_argument("--signature", required=True)
     verify.add_argument("artifact", type=Path)

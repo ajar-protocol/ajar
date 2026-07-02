@@ -65,7 +65,17 @@
     },
     {
       "if": { "properties": { "risk": { "enum": ["R2", "R3"] } }, "required": ["risk"] },
-      "then": { "properties": { "execution": { "const": "two_phase" } } }
+      "then": {
+        "properties": {
+          "execution": { "const": "two_phase" },
+          "requires": {
+            "required": ["mandate_scopes"],
+            "properties": {
+              "mandate_scopes": { "minItems": 1 }
+            }
+          }
+        }
+      }
     }
   ],
   "patternProperties": {

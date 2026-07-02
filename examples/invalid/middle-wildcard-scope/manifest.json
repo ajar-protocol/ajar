@@ -1,0 +1,77 @@
+{
+  "ajar_version": "0.1",
+  "supported_versions": ["0.1"],
+  "profiles": ["CORE", "ACT"],
+  "site": {
+    "name": "Middle Wildcard Scope Example",
+    "domain": "middle-wildcard.example",
+    "description": "Invalid manifest for middle-wildcard scope testing.",
+    "languages": ["en"],
+    "contact": "agents@middle-wildcard.example"
+  },
+  "keys": {
+    "owner": {
+      "kty": "OKP",
+      "crv": "Ed25519",
+      "x": "ownerMiddleWildcardPublicKey001",
+      "kid": "owner-2026"
+    },
+    "operational": []
+  },
+  "views": {
+    "negotiation": ["application/ajar+json"],
+    "index": "/ajar/views/index",
+    "chunking": {
+      "stable_ids": true,
+      "diff": "etag-per-chunk"
+    },
+    "license": {
+      "read": "allowed",
+      "train": "denied"
+    }
+  },
+  "actions": [
+    {
+      "id": "purchase_with_bad_scope",
+      "title": "Purchase with bad scope",
+      "risk": "R2",
+      "input_schema": {
+        "type": "object"
+      },
+      "output_schema": {
+        "type": "object"
+      },
+      "effects": [
+        {
+          "type": "commerce.purchase",
+          "description": "Ticket purchase."
+        }
+      ],
+      "simulate": true,
+      "execution": "two_phase",
+      "idempotency": "required",
+      "requires": {
+        "tier": "verified",
+        "mandate_scopes": ["commerce.*.ticket"]
+      },
+      "endpoint": "/ajar/actions/purchase_with_bad_scope",
+      "transport": "ajar-http"
+    }
+  ],
+  "policy_summary": {
+    "audience_tiers": ["anonymous", "verified"],
+    "rate_limits": {
+      "anonymous": "60/h",
+      "verified": "600/h"
+    },
+    "requires_mandate_from_risk": "R2"
+  },
+  "issued_at": "2026-07-02T00:00:00Z",
+  "expires_at": "2026-10-01T00:00:00Z",
+  "sequence": 1,
+  "signature": {
+    "alg": "Ed25519",
+    "kid": "owner-2026",
+    "sig": "middleWildcardManifestSignature001"
+  }
+}

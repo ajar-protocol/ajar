@@ -60,7 +60,7 @@ Trust triangle: **Principal → (mandate) → Agent → (signed requests) → Si
 | Extractor | Tier-2 deterministic extraction: crawl-once, boilerplate stripping, HTML→semantic-markdown, **template clustering** (rules per template, not per page) |
 | Inducer | Tier-3 build-time LLM assist: labels fields on sample pages per template, **emits deterministic extraction rules + draft manifest text** (LLM output is config, never a serving-path component) |
 | Action Drafter | Derives *candidate* actions from forms/APIs/OpenAPI. Drafts only — never published without owner approval |
-| Policy Engine | Evaluates the Owner Policy (see `06-OWNER-CONTROL.md`) on every request: audience tier, pricing, rate limits, risk gates |
+| Policy Engine | Evaluates the Owner Policy (see `05-OWNER-CONTROL.md`) on every request: audience tier, pricing, rate limits, risk gates |
 | Signer | Manages owner keys; signs manifest, content chunks, offers, receipts; publishes to transparency logs |
 | Serving Layer | Content negotiation on the *same URLs* (browser→HTML, agent→semantic view); chunk-addressed diffs; SIMULATE + propose/commit endpoints; 402 metering |
 | Freshness | CMS event hooks where available; content-hash diffing elsewhere; drift detection → re-induction |
@@ -80,7 +80,7 @@ The defining property: **the model is untrusted.** Prompt injection means any we
 | Resolver | `.well-known` fetch, Index queries, manifest signature + transparency-log verification, caching |
 | Mandate Store | Holds the principal's signed mandates; hardware/OS keystore for principal keys where available |
 | Policy Monitor | Deterministic pre-action check of every proposed call against mandate scope, budget, risk class. **Not bypassable by model output** |
-| Simulator | Drives SIMULATE before any R1+ action; surfaces predicted effects to policy/human checkpoints |
+| Simulator | Drives SIMULATE before any R2/R3 action; available for any R1+ action |
 | Executor | Signed HTTP (RFC 9421); idempotency keys; propose/commit state machine; payment rail adapters |
 | Taint Boundary | All site-originated content enters the model as inert, provenance-tagged data; only manifest-declared schemas are executable |
 | Receipt Vault | Append-only local log of mandates presented, simulations, commits, receipts — the audit trail |
@@ -127,7 +127,7 @@ All are canonical JSON (JCS/RFC 8785) signed structures; full schemas in `03-PRO
 - **Mandate** — issuer (principal), subject (agent), scope, caps, expiry, delegation chain (UCAN-compatible).
 - **Offer** — site-signed frozen proposal (the "propose" artifact).
 - **Receipt** — dual-signed record binding mandate + offer + result.
-- **Policy** — owner configuration (audience tiers, pricing, gates); see `06-OWNER-CONTROL.md`.
+- **Policy** — owner configuration (audience tiers, pricing, gates); see `05-OWNER-CONTROL.md`.
 
 ## 6. Architectural invariants
 
@@ -137,7 +137,7 @@ All are canonical JSON (JCS/RFC 8785) signed structures; full schemas in `03-PRO
 4. Index is discovery-only; origin verification is mandatory.
 5. Every R2/R3 effect has a dual-signed receipt or it didn't happen.
 6. Fallback mode is consensual: honors robots/AIPREF/402; output flagged `unverified`.
-7. All formats carry `ajar_version` + extension namespaces (`x-*` and registered vendor prefixes).
+7. All formats carry `ajar_version` + extension namespaces (`x-*` prefixes per spec §13).
 
 ## 7. Technology direction (recommendation, finalize per ADR at build time)
 

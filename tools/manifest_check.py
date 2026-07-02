@@ -57,7 +57,7 @@ def semantic_errors(manifest: dict, served_path: str | None) -> list[str]:
     errors: list[str] = []
 
     if served_path is not None and served_path != "/.well-known/ajar.json":
-        errors.append("AJAR-POLICY-DENIED: manifest must be served at /.well-known/ajar.json")
+        errors.append("AJAR-MANIFEST-LOCATION: manifest must be served at /.well-known/ajar.json")
 
     version = manifest.get("ajar_version")
     if version and version not in manifest.get("supported_versions", []):
@@ -78,7 +78,7 @@ def semantic_errors(manifest: dict, served_path: str | None) -> list[str]:
         expires = parse_dt(manifest["expires_at"])
         if expires <= issued:
             errors.append("AJAR-VERIFY-EXPIRED: expires_at must be after issued_at")
-        if (expires - issued).days > MAX_MANIFEST_DAYS:
+        if (expires - issued).total_seconds() > MAX_MANIFEST_DAYS * 24 * 60 * 60:
             errors.append("AJAR-VERIFY-EXPIRED: manifest lifetime must not exceed 180 days")
     except KeyError:
         pass

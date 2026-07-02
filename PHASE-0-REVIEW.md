@@ -18,16 +18,27 @@ Formal Phase 0 exit still requires one non-local proof:
 
 Hosted validation is installed in `.github/workflows/validate.yml` and the
 first main-branch run passed for commit `6d94400`
-(https://github.com/ajar-protocol/ajar/actions/runs/28567156904). The final
-ambiguity pass is tracked separately because it can produce either blocking
-fixes or documented deferrals
-([issue #3](https://github.com/ajar-protocol/ajar/issues/3)).
+(https://github.com/ajar-protocol/ajar/actions/runs/28567156904).
+
+The final ambiguity pass ([issue #3](https://github.com/ajar-protocol/ajar/issues/3))
+was completed on 2026-07-02. It resolved cross-document contradictions
+(client SIMULATE obligation, revocation fail-closed semantics, forbidden-scope
+precedence, commit signature binding, extension-prefix conventions), pinned
+down underspecified surfaces (segment-wise wildcard matching, per-chunk-ETag
+view sync, simulation-divergence definition, the 180-day manifest lifetime
+cap, `Ajar-Price` and `Ajar-Date` headers, mandate domain matching), aligned
+the spec prose with the schemas (offer, simulation, and view envelopes;
+operational key scopes), tightened the schemas (suffix-only wildcards, R2/R3
+mandate-scope requirement, risk-floor-preserving policy enum), added the
+`AJAR-SCHEMA-INVALID` and `AJAR-MANIFEST-LOCATION` error codes plus the
+missing failure vectors, and reconciled the MUST-coverage table with honest
+follow-up markers. One deferral was recorded as OQ-6 below.
 
 ## Task Evidence
 
 | Task | Evidence | Status |
 |---|---|---|
-| T0.1 spec review pass | `docs/03-PROTOCOL-SPEC.md`, `docs/02-ARCHITECTURE.md`, `docs/04-SECURITY-MODEL.md`, open questions below | Baseline reviewed; independent issue pass still needed before final freeze |
+| T0.1 spec review pass | `docs/03-PROTOCOL-SPEC.md`, `docs/02-ARCHITECTURE.md`, `docs/04-SECURITY-MODEL.md`, open questions below | Baseline reviewed; ambiguity pass complete (issue #3) |
 | T0.2 canonicalization and signatures | `docs/03-PROTOCOL-SPEC.md` section 2.4, `test-vectors/crypto-signing.json`, `tools/signing_profile.py` | Local evidence complete |
 | T0.3 scope registry v1 | `registries/scopes.md`, `test-vectors/scope-vectors.json`, `tools/scope_match.py` | Local evidence complete |
 | T0.4 JSON Schemas | `schemas/*.schema.json`, `examples/`, `tools/validate_examples.py`, `.github/workflows/validate.yml`, `ci/validate.yml` | Local and hosted validation green |
@@ -51,6 +62,7 @@ before the affected surface is declared stable.
 | OQ-3 | SIMULATE for uncertain outcomes | Keep zero-side-effect and faithful resolved-effect requirement; add probabilistic syntax only through AEP |
 | OQ-4 | Privacy-preserving discovery | Keep Index discovery optional and untrusted; defer private query mechanisms |
 | OQ-5 | Scope-registry governance | Use AEPs for v0.1 draft; define external registry governance before neutral transfer |
+| OQ-6 | Trust-list format, subscription, and verification semantics | Undefined in v0.1; defer `verified`-tier interop across Gateways |
 
 ## Independent Reader Exercise
 

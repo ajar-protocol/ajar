@@ -32,7 +32,7 @@
     "count": 1
   },
   "constraints": {
-    "domains_allow": ["*.examplerail.example"],
+    "domains_allow": ["examplerail.example", "*.examplerail.example"],
     "risk_max": "R3",
     "forbidden": []
   },

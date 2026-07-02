@@ -11,16 +11,22 @@ ends in `.*`.
 Given a mandate scope `M` and an action-required scope `R`:
 
 1. `M == R` matches.
-2. `M` ending in `.*` matches every `R` with the same prefix before `.*`.
+2. `M` ending in `.*` matches every `R` consisting of `M`'s segments before `.*` followed by one or more additional segments.
 3. Wildcards are suffix-only. `commerce.*.ticket` is invalid.
-4. A more specific deny in `constraints.forbidden` overrides an allowed scope.
+4. Any matching entry in `constraints.forbidden` overrides an allowed scope.
 5. `x-<vendor>.*` scopes are private extensions and never match core scopes.
+
+Matching is segment-wise, never a raw string prefix: `commerce.purchase.*` does
+not match `commerce.purchaseextra.x`, and it does not match the bare parent
+`commerce.purchase`.
 
 Examples:
 
 | Mandate scope | Required scope | Verdict |
 |---|---|---|
 | `commerce.purchase.*` | `commerce.purchase.transport` | allow |
+| `commerce.purchase.*` | `commerce.purchase.transport.rail` | allow |
+| `commerce.purchase.*` | `commerce.purchase` | deny |
 | `commerce.purchase.transport` | `commerce.purchase.transport` | allow |
 | `commerce.purchase.transport` | `commerce.purchase.event` | deny |
 | `content.read.*` | `content.write.comment` | deny |

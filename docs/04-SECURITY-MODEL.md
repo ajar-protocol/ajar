@@ -94,7 +94,7 @@ This mirrors PCAS/CaMeL-class research findings (see 01-RESEARCH §2.7): determi
 
 ## 5. Security engineering process (repo policy)
 
-- Threat model reviewed at every phase gate (ROADMAP milestones) — new components, new table rows here.
+- Threat model reviewed at every phase gate (the planning repo's ROADMAP milestones) — new components, new table rows here.
 - All crypto usage goes through one audited module per implementation; no ad-hoc signing anywhere.
 - Conformance suite includes **adversarial cases** (forged manifests, expired offers, over-cap commits, injection corpora) — passing it is release-blocking.
 - Public disclosure policy + SECURITY.md before first public release (Phase 1 exit criterion).

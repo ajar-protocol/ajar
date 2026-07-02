@@ -30,7 +30,7 @@
     },
     "scope": {
       "type": "string",
-      "pattern": "^(content|commerce|communication|account|data|x-[a-z0-9-]+)(\\.[a-z0-9_*:-]+)+$"
+      "pattern": "^(content|commerce|communication|account|data|x-[a-z0-9-]+)(\\.[a-z0-9_:-]+)+(\\.\\*)?$"
     },
     "base64url": {
       "type": "string",
