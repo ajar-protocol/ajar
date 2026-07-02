@@ -19,6 +19,7 @@ Ajar is an owner-controlled semantic layer over HTTPS. It defines a signed Capab
 | `examples/` | Golden examples, valid + deliberately invalid |
 | `registries/` | Scope registry, error codes, settlement adapters |
 | `test-vectors/` | Seed conformance-vector data and MUST coverage |
+| `PHASE-0-BASELINE.md` | Local readiness evidence for the v0.1 draft baseline |
 | `AEPs/` | Ajar Enhancement Proposals |
 
 ## Reading order
@@ -29,6 +30,7 @@ Implementer: spec → schemas → examples → conformance suite. Newcomer: [`pl
 ```bash
 python3 -m pip install -r requirements-dev.txt
 make validate
+python3 tools/check_phase0.py
 ```
 
 Expected result:

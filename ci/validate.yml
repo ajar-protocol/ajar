@@ -18,4 +18,5 @@ jobs:
       - run: python3 tools/validate_examples.py
       - run: python3 tools/check_links.py
       - run: python3 tools/check_markdown.py
+      - run: python3 tools/check_phase0.py
       - run: python -m json.tool examples/manifests/commerce-core-act-pay.json >/dev/null
